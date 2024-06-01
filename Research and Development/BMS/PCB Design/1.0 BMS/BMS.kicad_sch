@@ -1,0 +1,82 @@
+(kicad_sch (version 20230121) (generator eeschema)
+
+  (uuid 6a3ce5ef-19f4-4e9b-8584-644be5065818)
+
+  (paper "A4")
+
+  (lib_symbols
+  )
+
+
+  (sheet (at -91.44 162.56) (size 85.09 40.64) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid 6d227bff-cac8-4b99-bb1a-538a885fed1d)
+    (property "Sheetname" "Control Output" (at -91.44 161.8484 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "Control Output.kicad_sch" (at -91.44 203.7846 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "BMS"
+        (path "/6a3ce5ef-19f4-4e9b-8584-644be5065818" (page "4"))
+      )
+    )
+  )
+
+  (sheet (at -92.71 215.9) (size 83.82 82.55) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid 808dec4b-7c38-4e01-80a2-9cf537cc0167)
+    (property "Sheetname" "Comparator Portion" (at -92.71 215.1884 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "untitled.kicad_sch" (at -92.71 299.0346 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "BMS"
+        (path "/6a3ce5ef-19f4-4e9b-8584-644be5065818" (page "3"))
+      )
+    )
+  )
+
+  (sheet (at -83.82 82.55) (size 57.15 30.48) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid c1973597-675d-4da1-aba3-5209248981eb)
+    (property "Sheetname" "Micro Controller Logic Use" (at -83.82 81.8384 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "Temp_Voltage_Controller.kicad_sch" (at -83.82 113.6146 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "BMS"
+        (path "/6a3ce5ef-19f4-4e9b-8584-644be5065818" (page "5"))
+      )
+    )
+  )
+
+  (sheet (at 11.43 215.9) (size 275.59 198.12) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid c4ab3065-f37a-4afa-b448-91a7bd408bc4)
+    (property "Sheetname" "Battery controller mount" (at 11.43 215.1884 0) (show_name)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "battery_controller.kicad_sch" (at 11.43 414.6046 0) (show_name)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "BMS"
+        (path "/6a3ce5ef-19f4-4e9b-8584-644be5065818" (page "2"))
+      )
+    )
+  )
+
+  (sheet_instances
+    (path "/" (page "1"))
+  )
+)
