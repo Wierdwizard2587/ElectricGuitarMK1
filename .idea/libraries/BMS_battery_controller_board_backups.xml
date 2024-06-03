@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="BMS battery controller board-backups">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Research and Development/BMS/PCB Design/1.0 BMS/BMS battery controller board/BMS battery controller board-backups/BMS battery controller board-2024-06-01_134506.zip!/" />
+      <root url="jar://$PROJECT_DIR$/Research and Development/BMS/PCB Design/1.0 BMS/BMS battery controller board/BMS battery controller board-backups/BMS battery controller board-2024-04-02_125614.zip!/" />
+      <root url="jar://$PROJECT_DIR$/Research and Development/BMS/PCB Design/1.0 BMS/BMS battery controller board/BMS battery controller board-backups/BMS battery controller board-2024-06-01_135619.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
