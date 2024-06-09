@@ -208,7 +208,17 @@
     "equivalence_files": []
   },
   "erc": {
-    "erc_exclusions": [],
+    "erc_exclusions": [
+      "pin_not_connected|2590800|368300|d031b271-f431-4fab-a745-1adbe8b570c2|00000000-0000-0000-0000-000000000000|||",
+      "pin_not_connected|711200|1231900|08b4bac7-6cff-4d8c-b115-ba6aa9750edd|00000000-0000-0000-0000-000000000000|||",
+      "pin_not_connected|723900|469900|c7f2c0e8-541c-4f83-a08a-01fa4ff5dbc0|00000000-0000-0000-0000-000000000000|||",
+      "power_pin_not_driven|1460500|266700|a6e53eee-b6cc-4e17-9b8a-5aed49381b2c|00000000-0000-0000-0000-000000000000|||",
+      "power_pin_not_driven|1993900|482600|a8887adb-90cd-48d4-9d74-06074189cf50|00000000-0000-0000-0000-000000000000|||",
+      "power_pin_not_driven|1993900|635000|5ffb8163-69f5-48db-bf69-5230605f591d|00000000-0000-0000-0000-000000000000|||",
+      "power_pin_not_driven|2489200|1498600|3642c8dd-cbbf-4a9e-94ef-cb18393f0627|00000000-0000-0000-0000-000000000000|||",
+      "power_pin_not_driven|2501900|1384300|fe174f19-a29e-4b22-bf3f-3c3eb87a4161|00000000-0000-0000-0000-000000000000|||",
+      "power_pin_not_driven|317500|419100|3e4577c7-c82e-46eb-a451-d4add1fcba51|00000000-0000-0000-0000-000000000000|||"
+    ],
     "meta": {
       "version": 0
     },
@@ -512,12 +522,8 @@
       ""
     ],
     [
-      "ec95b029-1f26-4fc2-be0a-ea486dbb352e",
-      "Battery charging block"
-    ],
-    [
-      "1ad01a1d-3661-4e4b-bfa4-117d0370fdd8",
-      "Charger "
+      "d3cdf4e3-9123-4712-918c-6e71da524d63",
+      "Charger"
     ]
   ],
   "text_variables": {}
