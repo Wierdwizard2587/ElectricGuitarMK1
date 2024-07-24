@@ -18,16 +18,18 @@
 
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-//#include "TomThumb.h"
+
+
+#include <FXControl.h>
+
+int buttonPin = 14;
+
+
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 
-// Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
-// The pins for I2C are defined by the Wire-library. 
-// On an arduino UNO:       A4(SDA), A5(SCL)
-// On an arduino MEGA 2560: 20(SDA), 21(SCL)
-// On an arduino LEONARDO:   2(SDA),  3(SCL), ...
+
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, OLED_RESET);
@@ -146,11 +148,20 @@ seesaw_NeoPixel pixels = seesaw_NeoPixel(4, SS_NEO_PIN, NEO_GRB + NEO_KHZ800, &W
 
 int32_t enc_positions[4] = {0, 0, 0, 0};
 
-const int buttonPin = 14;
+
 
 int currentEffect;
 int currentHoverOption = 0;
+
+
+
+FXControl fxControl(buttonPin, ss);
+
+
+
 void setup() {
+
+
   // put your setup code here, to run once:
     // Audio connections require memory to work.  For more
   // detailed information, see the MemoryAndCpuUsage example
@@ -560,26 +571,39 @@ void chorusFX() {
             pixels.show();
         }
 
-        if (!ss.digitalRead(SS_ENC3_SWITCH)) {
-          Serial.println("ENC3 pressed!");
-          Serial.println("effect is now on");
-          if (chorusActive == false){
-              Serial.print("effect now ON");
+        //if (!ss.digitalRead(SS_ENC3_SWITCH)) {
+          //Serial.println("ENC3 pressed!");
+          //Serial.println("effect is now on");
+          //if (chorusActive == false){
+              //Serial.print("effect now ON");
+              //chorusActive = true;
+              //chorus_sw.gain(0, 0);
+              //chorus_sw.gain(1, 1);
+          //}
+          //else {
+              //Serial.print("effect now OFF");
+              //chorusActive = false;
+              //chorus_sw.gain(0, 1);
+              //chorus_sw.gain(1, 0);
+          //}         
+        //}
+        //while (!ss.digitalRead(SS_ENC3_SWITCH)) {
+        // Debounce delay
+        //delay(50);
+        //}
+
+        bool fxState = chorusActive;
+
+        if (fxControl.toggleEffect(fxState) == true) {
               chorusActive = true;
               chorus_sw.gain(0, 0);
               chorus_sw.gain(1, 1);
-          }
-          else {
-              Serial.print("effect now OFF");
+        } else {
               chorusActive = false;
               chorus_sw.gain(0, 1);
               chorus_sw.gain(1, 0);
-          }         
         }
-        while (!ss.digitalRead(SS_ENC3_SWITCH)) {
-        // Debounce delay
-        delay(50);
-        }
+
 
         int32_t enc_3_pos = ss.getEncoderPosition(3);
         if (enc_positions[3] != enc_3_pos) {
