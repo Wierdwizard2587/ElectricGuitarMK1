@@ -9,6 +9,7 @@
 
 #define SEESAW_ADDR      0x49
 
+#include <Arduino.h>
 
 #include <Audio.h>
 #include <Wire.h>
@@ -18,18 +19,16 @@
 
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-
-
-#include <FXControl.h>
-
-int buttonPin = 14;
-
-
+//#include "TomThumb.h"
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 
-
+// Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
+// The pins for I2C are defined by the Wire-library. 
+// On an arduino UNO:       A4(SDA), A5(SCL)
+// On an arduino MEGA 2560: 20(SDA), 21(SCL)
+// On an arduino LEONARDO:   2(SDA),  3(SCL), ...
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, OLED_RESET);
@@ -129,9 +128,15 @@ const int inputChSelect = AUDIO_INPUT_LINEIN;
 // audio shield volume
 int masterVolume        = 0;
 
+#define FLANGE_DELAY_LENGTH (6*AUDIO_BLOCK_SAMPLES)
+short flange_delayline[FLANGE_DELAY_LENGTH];
+int s_idx = FLANGE_DELAY_LENGTH/4;
+int s_depth = FLANGE_DELAY_LENGTH/4;
+double s_freq = .5;
+bool flangeActive = false;
+
 
 #define chorusDelayLength (16*AUDIO_BLOCK_SAMPLES)  // Number of samples in each delay line
-
 short l_delayline[chorusDelayLength]; // Allocate the delay lines for left and right channels
 int   n_chorus = 2;                   // number of "voices" in the chorus including the original voice
 bool  chorusActive = false;  
@@ -148,24 +153,34 @@ seesaw_NeoPixel pixels = seesaw_NeoPixel(4, SS_NEO_PIN, NEO_GRB + NEO_KHZ800, &W
 
 int32_t enc_positions[4] = {0, 0, 0, 0};
 
-
+const int buttonPin = 14;
 
 int currentEffect;
+float param;
+int fxEncRes;
+
+
+
+
 int currentHoverOption = 0;
-
-
-
-FXControl fxControl(buttonPin, ss);
-
-
-
 void setup() {
 
 
-  // put your setup code here, to run once:
-    // Audio connections require memory to work.  For more
-  // detailed information, see the MemoryAndCpuUsage example
-  AudioMemory(120);
+  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;); // Don't proceed, loop forever
+  }
+
+  // Show initial display buffer contents on the screen --
+  // the library initializes this with an Adafruit splash screen.
+  display.display();
+  testLoadingScreen();
+
+  Serial.begin(115200);
+  while (!Serial) delay(10);
+
+
+  AudioMemory(250);
 
   // Comment these out if not using the audio adaptor board.
   Serial.print("init audio shield...");
@@ -195,36 +210,17 @@ void setup() {
   delay_sw.gain(3, 0);
 
 
-
-  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
-    Serial.println(F("SSD1306 allocation failed"));
-    for(;;); // Don't proceed, loop forever
-  }
-
-
-    // Show initial display buffer contents on the screen --
-  // the library initializes this with an Adafruit splash screen.
-  display.display();
-  delay(2000); // Pause for 2 seconds
-   // Draw many lines
-
-  testLoadingScreen();
-
   if (!chorus.begin(l_delayline, chorusDelayLength, n_chorus)) {
     Serial.println("AudioEffectChorus - left channel begin failed");
     while (1);
   }
-  delay(2000);
-  delay(2000);
+
+  flange.begin(flange_delayline, FLANGE_DELAY_LENGTH, s_idx, s_depth, s_freq);
 
 
   pinMode(buttonPin, INPUT_PULLUP);
 
-  Serial.begin(115200);
-  while (!Serial) delay(10);
-
-  // Initialize I2C communication
-  Wire1.begin();  // No need to specify SDA and SCL pins for Teensy 4.0
+  Wire1.begin();
 
   Serial.println("Looking for seesaw!");
   
@@ -267,18 +263,7 @@ void setup() {
 
 int i = 0;
 void loop() {
-
-
-  while (i<3) {
-    loading();
-
-    i = i + 1;
-    delay(1000);
-  }
-
   landingPage();
-
-  delay(10);
 }
 
 uint32_t Wheel(byte WheelPos) {
@@ -294,9 +279,6 @@ uint32_t Wheel(byte WheelPos) {
   return seesaw_NeoPixel::Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
-void loading() {
-  Serial.print("Starting up. Display loading Screen... ");
-}
 
 void landingPage() {
 
@@ -502,11 +484,6 @@ void EQPage() {
 }
 
 void FXMainPage() {
-  Serial.println("**************FX Controls Page**************");
-  Serial.println("FX options and details...");
-  Serial.println("press ENC3 to return to landing menu");
-
-  // Wait for the button to be released if it was pressed
   while (!ss.digitalRead(SS_ENC3_SWITCH)) {
     // Debounce delay
     delay(50);
@@ -524,309 +501,194 @@ void FXMainPage() {
   landingPage();
 }
 
-void chorusFX() {
-    Serial.println("**************Effect #2 : Chorus**************");
-    if (chorusActive == false){
-        Serial.print("OFF");
-    }
-    else {
-      Serial.print("ON");
-    }
-    Serial.println("Voices amount: ");
-    Serial.print(n_chorus);
-    currentEffect = 1;
+void flangeFX() {
+    currentEffect = 0;
     while (true) {
-        chorusSetPage();
-        int buttonState = digitalRead(buttonPin); 
+        flangeSetPage();
 
-        if (buttonState == LOW) {
-          Serial.println("Home Button pressed!");
-          delay(500); 
-          landingPage();
-          }
+        checkHomeButton();
 
-        int32_t enc_0_pos = ss.getEncoderPosition(0);
-        if (enc_positions[0] != enc_0_pos) {
-            int change = enc_0_pos - enc_positions[0];
-
-            // Update the encoder position
-            enc_positions[0] = enc_0_pos;
-
-            // Adjust n_chorus based on the change, ensuring it remains within the valid range
-            if (change > 0 && n_chorus < 16) {
-                n_chorus++;
-            } else if (change < 0 && n_chorus > 2) {
-                n_chorus--;
-            }
-
-            // Update the effect
-            chorus.voices(n_chorus);
-
-            // Display the new value
-            Serial.print("Voices amount: ");
-            Serial.println(n_chorus);
-
-            // Update the NeoPixel color
-            pixels.setPixelColor(0, Wheel((enc_0_pos * 4) & 0xFF));
-            pixels.show();
+        //flange Freq Control Encoder Check
+        param = s_freq;
+        fxEncRes = EncDialCheck(0, param, 5.0, 0.0);
+        if (fxEncRes == 2) {
+          s_freq = s_freq + 0.1;
+        } 
+        if (fxEncRes == 1) {
+          s_freq = s_freq - 0.1;
         }
-
-        //if (!ss.digitalRead(SS_ENC3_SWITCH)) {
-          //Serial.println("ENC3 pressed!");
-          //Serial.println("effect is now on");
-          //if (chorusActive == false){
-              //Serial.print("effect now ON");
-              //chorusActive = true;
-              //chorus_sw.gain(0, 0);
-              //chorus_sw.gain(1, 1);
-          //}
-          //else {
-              //Serial.print("effect now OFF");
-              //chorusActive = false;
-              //chorus_sw.gain(0, 1);
-              //chorus_sw.gain(1, 0);
-          //}         
-        //}
-        //while (!ss.digitalRead(SS_ENC3_SWITCH)) {
-        // Debounce delay
-        //delay(50);
-        //}
-
-        bool fxState = chorusActive;
-
-        if (fxControl.toggleEffect(fxState) == true) {
-              chorusActive = true;
-              chorus_sw.gain(0, 0);
-              chorus_sw.gain(1, 1);
-        } else {
-              chorusActive = false;
-              chorus_sw.gain(0, 1);
-              chorus_sw.gain(1, 0);
-        }
+        flange.voices(s_idx,s_depth,s_freq);
 
 
-        int32_t enc_3_pos = ss.getEncoderPosition(3);
-        if (enc_positions[3] != enc_3_pos) {
-            int change = enc_3_pos - enc_positions[3];
+        //Check flange FX active Toggle
+        EncToggleCheck(flangeActive, flange_sw);
 
-            // Update the encoder position
-            enc_positions[3] = enc_3_pos;
-            Serial.print(change);
-            // Adjust n_chorus based on the change, ensuring it remains within the valid range
-            if (change > 0 && currentEffect < 3) {
-                reverbFX();
-            } else if (change < 0 && currentEffect > 0) {
-                Serial.print("go  to fx 1, not made yet");
-            }
-            // Update the NeoPixel color
-            pixels.setPixelColor(0, Wheel((enc_0_pos * 4) & 0xFF));
-            pixels.show();
-        }
+        //Check FX selected change 
+        cycleFX(3, currentEffect, 3.0, 0.0);
     }
 }
 
-void reverbFX() {
-    Serial.println("**************Effect #3 : Reverb**************");
-    if (reverbActive == false){
-        Serial.print("OFF");
-    }
-    else {
-      Serial.print("ON");
-    }
-    Serial.println("roomSize amount: ");
-    Serial.print(revRoomsize);
-    Serial.println("Damping amount: ");
-    Serial.print(revDamping);
 
+void chorusFX() {
+    currentEffect = 1;
     while (true) {
+        chorusSetPage();
 
-        int buttonState = digitalRead(buttonPin); 
+        checkHomeButton();
 
-        if (buttonState == LOW) {
-          Serial.println("Home Button pressed!");
-          delay(500); 
-          landingPage();
-          }
-
-        int32_t enc_0_pos = ss.getEncoderPosition(0);
-        if (enc_positions[0] != enc_0_pos) {
-            int change = enc_0_pos - enc_positions[0];
-
-            // Update the encoder position
-            enc_positions[0] = enc_0_pos;
-
-            // Adjust n_chorus based on the change, ensuring it remains within the valid range
-            if (change > 0 && revRoomsize < 1.0) {
-                revRoomsize = revRoomsize + 0.05;
-            } else if (change < 0 && revRoomsize > 0.0) {
-                revRoomsize = revRoomsize - 0.05;
-            }
-
-            // Update the effect
-            freeverb.roomsize(revRoomsize);
-
-            // Display the new value
-            Serial.print("Room size amount: ");
-            Serial.println(revRoomsize);
-
-            // Update the NeoPixel color
-            pixels.setPixelColor(0, Wheel((enc_0_pos * 4) & 0xFF));
-            pixels.show();
+        //chorus Voice amount Control Encoder Check
+        param = n_chorus;
+        fxEncRes = EncDialCheck(0, param, 16, 2);
+        if (fxEncRes == 2) {
+          n_chorus++;
+        } 
+        if (fxEncRes == 1) {
+          n_chorus--;
         }
+        chorus.voices(n_chorus);
 
-        int32_t enc_1_pos = ss.getEncoderPosition(1);
-        if (enc_positions[1] != enc_1_pos) {
-            int change = enc_1_pos - enc_positions[1];
+        EncToggleCheck(chorusActive, chorus_sw); //Check Chorus FX active Toggle
+        
+        cycleFX(3, currentEffect, 3.0, 0.0); //Check FX selected change 
+    }
+}
 
-            // Update the encoder position
-            enc_positions[1] = enc_1_pos;
 
-            // Adjust n_chorus based on the change, ensuring it remains within the valid range
-            if (change > 0 && revDamping < 1.0) {
-                revDamping = revDamping + 0.05;
-            } else if (change < 0 && revDamping > 0.0) {
-                revDamping = revDamping - 0.05;  
-            }
-            freeverb.damping(revDamping);
+void reverbFX() {
+    currentEffect = 2;
+    while (true) {
+        ReverbSetPage();
 
-            // Display the new value
-            Serial.print("damping: ");
-            Serial.println(revDamping);
+        checkHomeButton();
 
-            // Update the NeoPixel color
-            pixels.setPixelColor(1, Wheel((enc_1_pos * 4) & 0xFF));
-            pixels.show();
+        //Reverb Room Size Control Encoder Check
+        param = revRoomsize;
+        fxEncRes = EncDialCheck(0, param, 1.0, 0.0);
+        if (fxEncRes == 2) {
+          revRoomsize = revRoomsize + 0.05;
+        } 
+        if (fxEncRes == 1) {
+          revRoomsize = revRoomsize - 0.05;
         }
+        freeverb.roomsize(revRoomsize);
 
-        if (!ss.digitalRead(SS_ENC3_SWITCH)) {
-          Serial.println("ENC3 pressed!");
-          Serial.println("effect is now on");
-          if (reverbActive == false){
-              Serial.print("effect now ON");
-              reverbActive = true;
-              reverb_sw.gain(0, 0);
-              reverb_sw.gain(1, 1);
-          }
-          else {
-              Serial.print("effect now OFF");
-              reverbActive = false;
-              reverb_sw.gain(0, 1);
-              reverb_sw.gain(1, 0);
-          }         
+        //Reverb Damping Control Encoder Check
+        param = revDamping;
+        fxEncRes = EncDialCheck(1, param, 1.0, 0.0);
+        if (fxEncRes == 2) {
+          revDamping = revDamping + 0.05;
+        } 
+        if (fxEncRes == 1) {
+          revDamping = revDamping - 0.05;
         }
-        while (!ss.digitalRead(SS_ENC3_SWITCH)) {
-        // Debounce delay
-        delay(50);
-        }
+        freeverb.damping(revDamping);
 
-        int32_t enc_3_pos = ss.getEncoderPosition(3);
-        if (enc_positions[3] != enc_3_pos) {
-            int change = enc_3_pos - enc_positions[3];
+        //Check reverb FX active Toggle
+        EncToggleCheck(reverbActive, reverb_sw);
 
-            // Update the encoder position
-            enc_positions[3] = enc_3_pos;
-            Serial.print(change);
-            // Adjust n_chorus based on the change, ensuring it remains within the valid range
-            if (change > 0 && currentEffect < 4) {
-                delayFX();
-            } else if (change < 0 && currentEffect > 0) {
-                chorusFX();
-            }
-            // Update the NeoPixel color
-            pixels.setPixelColor(0, Wheel((enc_0_pos * 4) & 0xFF));
-            pixels.show();
-        }
+        //Check FX selected change 
+        cycleFX(3, currentEffect, 3.0, 0.0);
     }
 }
 
 void delayFX() {
-    Serial.println("**************Effect #4 : Delay**************");
-    if (delayActive == false){
-        Serial.print("OFF");
-    }
-    else {
-      Serial.print("ON");
-    }
-    Serial.println("delay amount: ");
-    Serial.print(delayTime);
     currentEffect = 3;
-
-    // Update the effect
     while (true) {
         delaySetPage();
-        int buttonState = digitalRead(buttonPin); 
+        
+        checkHomeButton();
 
-        if (buttonState == LOW) {
-          Serial.println("Home Button pressed!");
-          delay(500); 
-          landingPage();
-          }
-
-        int32_t enc_0_pos = ss.getEncoderPosition(0);
-        if (enc_positions[0] != enc_0_pos) {
-            int change = enc_0_pos - enc_positions[0];
-
-            // Update the encoder position
-            enc_positions[0] = enc_0_pos;
-
-            // Adjust n_chorus based on the change, ensuring it remains within the valid range
-            if (change > 0 && delayTime < 1000) {
-                delayTime = delayTime + 50;
-            } else if (change < 0 && delayTime > 0) {
-                delayTime = delayTime - 50;
-            }
-            // Update the effect
-            delay1.delay(0, delayTime);
-
-            // Display the new value
-            Serial.print("delay amount: ");
-            Serial.println(delayTime);
-
-            // Update the NeoPixel color
-            pixels.setPixelColor(0, Wheel((enc_0_pos * 4) & 0xFF));
-            pixels.show();
+        //Delay time Control Encoder Check
+        param = delayTime;
+        fxEncRes = EncDialCheck(0, param, 1000, 0);
+        if (fxEncRes == 2) {
+          delayTime = delayTime + 50;
+        } 
+        if (fxEncRes == 1) {
+          delayTime = delayTime - 50;
         }
+        delay1.delay(0, delayTime);
 
-        if (!ss.digitalRead(SS_ENC3_SWITCH)) {
-          Serial.println("ENC3 pressed!");
-          Serial.println("effect is now on");
-          if (delayActive == false){
-              Serial.print("effect now ON");
-              delayActive = true;
-              delay_sw.gain(0, 1);
-              delay_sw.gain(1, 1);
-          }
-          else {
-              Serial.print("effect now OFF");
-              delayActive = false;
-              delay_sw.gain(0, 1);
-              delay_sw.gain(1, 0);
-          }         
-        }
-        while (!ss.digitalRead(SS_ENC3_SWITCH)) {
-        // Debounce delay
-        delay(50);
-        }
-
-        int32_t enc_3_pos = ss.getEncoderPosition(3);
-        if (enc_positions[3] != enc_3_pos) {
-            int change = enc_3_pos - enc_positions[3];
-
-            // Update the encoder position
-            enc_positions[3] = enc_3_pos;
-            Serial.print(change);
-            // Adjust n_chorus based on the change, ensuring it remains within the valid range
-            if (change > 0 && currentEffect < 4) {
-                Serial.print("go  to fx 1, not made yet");
-            } else if (change < 0 && currentEffect > 0) {
-                reverbFX();
-            }
-            // Update the NeoPixel color
-            pixels.setPixelColor(0, Wheel((enc_0_pos * 4) & 0xFF));
-            pixels.show();
-        }
+        //Check delay FX active Toggle
+        EncToggleCheck(delayActive, delay_sw);
+        delay_sw.gain(0, 1);
+        //Check FX selected change 
+        cycleFX(3, currentEffect, 3.0, 0.0);
     }
 }
+
+typedef void (*FunctionPointer)();
+FunctionPointer FXfunctions[] = { flangeFX, chorusFX, reverbFX, delayFX  };
+
+void checkHomeButton() {
+  int buttonState = digitalRead(buttonPin); 
+
+  if (buttonState == LOW) {
+    Serial.println("Home Button pressed!");
+    delay(500); 
+    landingPage();
+  }
+}
+
+int EncDialCheck(int encNo, float paramValue, float maxRange, float minRange) {
+    int32_t enc_pos = ss.getEncoderPosition(encNo);
+    if (enc_positions[0] != enc_pos) {
+        int change = enc_pos - enc_positions[encNo];
+
+        // Update the encoder position
+        enc_positions[encNo] = enc_pos;
+
+        // Adjust n_chorus based on the change, ensuring it remains within the valid range
+        if (change > 0 && paramValue < maxRange) {
+            return 2;
+        } else if (change < 0 && paramValue > minRange) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void EncToggleCheck(bool& FXActive, AudioMixer4& mixer_sw) {
+    if (!ss.digitalRead(SS_ENC3_SWITCH)) {
+      Serial.println("ENC3 pressed!");
+      Serial.println("effect is now on");
+      if (FXActive == false){
+          Serial.print("effect now ON");
+          FXActive = true;
+          mixer_sw.gain(0, 0);
+          mixer_sw.gain(1, 1);
+      }
+      else {
+          Serial.print("effect now OFF");
+          FXActive = false;
+          mixer_sw.gain(0, 1);
+          mixer_sw.gain(1, 0);
+      }         
+    }
+
+    while (!ss.digitalRead(SS_ENC3_SWITCH)) {
+    // Debounce delay
+    delay(50);
+    }
+}
+
+
+
+
+void cycleFX(int encNo, int param, int maxRange, int minRange) {
+    int EncRes;
+    EncRes = EncDialCheck(encNo, param, maxRange, minRange);
+    Serial.print(EncRes);
+    if (EncRes == 2) {
+        FXfunctions[param + 1]();;
+    } 
+    if (EncRes == 1) {
+        FXfunctions[param - 1]();;
+    }  
+}
+
+
+
 
 void testLoadingScreen() {
     display.clearDisplay();
@@ -876,7 +738,41 @@ void setLandingPage() {
     display.display();
 }
 
+
+
 const uint8_t bitmap21[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7f, 0xff, 0xe0, 0xff, 0xff, 0xf0, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xff, 0xff, 0xf0, 0x7f, 0xff, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+void flangeSetPage() {
+    display.clearDisplay();
+    display.setTextColor(WHITE);
+    display.setTextSize(1);
+    display.setFont(NULL);
+    display.setCursor(0, 10);
+    display.setCursor(0, 5);
+    display.setTextWrap(0);
+    display.setCursor(28, 5);
+    display.println("FX 1# Flange");
+    display.drawLine(0, 18, 128, 18, 1);
+    display.setCursor(10, 20);
+    display.print("Freq:");
+    display.setCursor(24, 35);
+    display.println(s_freq);
+    display.drawRect(109, 50, 17, 12, 1);
+    display.drawTriangle(114, 58, 120, 55, 114, 52, 1);
+    display.drawRect(2, 50, 17, 12, 1);
+    display.drawTriangle(13, 58, 13, 52, 6, 55, 1);
+    display.fillTriangle(114, 58, 120, 55, 114, 52, 1);
+    display.fillTriangle(13, 58, 13, 52, 6, 55, 1);
+    display.drawBitmap(102, -3, bitmap21, 24, 24, 1);
+    if (flangeActive == true){
+      display.fillRoundRect(60, 50, 10, 10, 3, 1);
+    }
+    else {
+      display.drawRoundRect(60, 50, 10, 10, 3, 1);
+    }
+    
+    display.display();
+}
 
 void chorusSetPage() {
     display.clearDisplay();
@@ -887,7 +783,7 @@ void chorusSetPage() {
     display.setCursor(0, 5);
     display.setTextWrap(0);
     display.setCursor(28, 5);
-    display.println("FX 1# Chorus");
+    display.println("FX 2# Chorus");
     display.drawLine(0, 18, 128, 18, 1);
     display.setCursor(10, 20);
     display.print("Voices:");
@@ -900,8 +796,51 @@ void chorusSetPage() {
     display.fillTriangle(114, 58, 120, 55, 114, 52, 1);
     display.fillTriangle(13, 58, 13, 52, 6, 55, 1);
     display.drawBitmap(102, -3, bitmap21, 24, 24, 1);
+    if (chorusActive == true){
+      display.fillRoundRect(60, 50, 10, 10, 3, 1);
+    }
+    else {
+      display.drawRoundRect(60, 50, 10, 10, 3, 1);
+    }
+    
     display.display();
 }
+
+void ReverbSetPage() {
+    display.clearDisplay();
+    display.setTextColor(WHITE);
+    display.setTextSize(1);
+    display.setFont(NULL);
+    display.setCursor(0, 10);
+    display.setCursor(0, 5);
+    display.setTextWrap(0);
+    display.setCursor(28, 5);
+    display.println("FX 3# Reverb");
+    display.drawLine(0, 18, 128, 18, 1);
+    display.setCursor(1, 20);
+    display.print("RoomSize:");
+    display.setCursor(15, 35);
+    display.println(revRoomsize);
+    display.setCursor(55, 20);
+    display.print("Damping:");
+    display.setCursor(65, 35);
+    display.println(revDamping);
+    display.drawRect(109, 50, 17, 12, 1);
+    display.drawTriangle(114, 58, 120, 55, 114, 52, 1);
+    display.drawRect(2, 50, 17, 12, 1);
+    display.drawTriangle(13, 58, 13, 52, 6, 55, 1);
+    display.fillTriangle(114, 58, 120, 55, 114, 52, 1);
+    display.fillTriangle(13, 58, 13, 52, 6, 55, 1);
+    display.drawBitmap(102, -3, bitmap21, 24, 24, 1);
+    if (reverbActive == true){
+      display.fillRoundRect(60, 50, 10, 10, 3, 1);
+    }
+    else {
+      display.drawRoundRect(60, 50, 10, 10, 3, 1);
+    }
+    display.display();
+}
+
 
 void delaySetPage() {
     display.clearDisplay();
@@ -925,6 +864,13 @@ void delaySetPage() {
     display.fillTriangle(114, 58, 120, 55, 114, 52, 1);
     display.fillTriangle(13, 58, 13, 52, 6, 55, 1);
     display.drawBitmap(102, -3, bitmap21, 24, 24, 1);
+    if (delayActive == true){
+      display.fillRoundRect(60, 50, 10, 10, 3, 1);
+    }
+    else {
+      display.drawRoundRect(60, 50, 10, 10, 3, 1);
+    }
     display.display();
 }
+
 
