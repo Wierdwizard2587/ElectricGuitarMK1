@@ -19,16 +19,10 @@
 
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-//#include "TomThumb.h"
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 
-// Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
-// The pins for I2C are defined by the Wire-library. 
-// On an arduino UNO:       A4(SDA), A5(SCL)
-// On an arduino MEGA 2560: 20(SDA), 21(SCL)
-// On an arduino LEONARDO:   2(SDA),  3(SCL), ...
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, OLED_RESET);
@@ -118,10 +112,6 @@ AudioConnection          patchCord13(delay_sw, 0, i2s2_out, 0);
 AudioConnection          patchCord14(delay_sw, 0, i2s2_out, 1);
 
 AudioControlSGTL5000     audioShield;     //xy=1157.3333206176758,200.22224235534668
-// GUItool: end automatically generated code
-
-
-// GUItool: end automatically generated code
 
 const int inputChSelect = AUDIO_INPUT_LINEIN;
 
@@ -159,9 +149,6 @@ int currentEffect;
 float param;
 int fxEncRes;
 
-
-
-
 int currentHoverOption = 0;
 void setup() {
 
@@ -183,11 +170,9 @@ void setup() {
   AudioMemory(250);
 
   // Comment these out if not using the audio adaptor board.
-  Serial.print("init audio shield...");
   audioShield.enable();
   audioShield.inputSelect(inputChSelect);  // select mic or line-in for audio shield input source
   audioShield.volume(0.7);
-  Serial.println("done.");
 
   flange_sw.gain(0, 1);
   flange_sw.gain(1, 0);
@@ -221,14 +206,11 @@ void setup() {
   pinMode(buttonPin, INPUT_PULLUP);
 
   Wire1.begin();
-
-  Serial.println("Looking for seesaw!");
   
   if (! ss.begin(SEESAW_ADDR) || !pixels.begin(SEESAW_ADDR)) {
     Serial.println("Couldn't find seesaw on default address");
     while(1) delay(10);
   }
-  Serial.println("seesaw started");
   uint32_t version = ((ss.getVersion() >> 16) & 0xFFFF);
   if (version  != 5752){
     Serial.print("Wrong firmware loaded? ");
@@ -245,23 +227,15 @@ void setup() {
                        1UL << SS_ENC2_SWITCH | 1UL << SS_ENC3_SWITCH, 1);
 
   
-  // get starting positions
   for (int e=0; e<4; e++) {
     enc_positions[e] = ss.getEncoderPosition(e);
     ss.enableEncoderInterrupt(e);
   }
-  
-  Serial.println("Turning on interrupts");
 
   pixels.setBrightness(255);
-  pixels.show(); // Initialize all pixels to 'off'
-
-
-  //skeleton setups
-  
+  pixels.show();
 }
 
-int i = 0;
 void loop() {
   landingPage();
 }
@@ -280,59 +254,26 @@ uint32_t Wheel(byte WheelPos) {
 }
 
 
-void landingPage() {
-
-  Serial.println();
-  Serial.println("**************Landing Page**************");  
-  Serial.print("Options:");
-  Serial.println();
-  Serial.print("0# FX");
-  Serial.println();
-  Serial.print("1# EQ");
-  Serial.println();
-  Serial.print("2# Audio");
-  Serial.println();
-  Serial.print("3# RGB");
-  Serial.println();
-  Serial.print("4# Settings");
-  
-
-  setLandingPage();
+void landingPage() { 
+  hoverOptionSelector();
 
   bool choosing = true;
 
   while (choosing == true) {
-
-
     int32_t enc_3_pos = ss.getEncoderPosition(3);
     if (enc_positions[3] != enc_3_pos) {
-      Serial.print("Encoder #");
-      Serial.print(3);
-      Serial.print(" -> ");
-      Serial.println(enc_3_pos); // Display new position
 
-      // Determine the direction of movement
       if (enc_3_pos > enc_positions[3]) {
-        // Encoder moved clockwise
-        if (currentHoverOption < 4) { // Adjusted boundary to 4 for 5 options (0 to 4)
+        if (currentHoverOption < 4) { 
           currentHoverOption++;
-        } else {
-          Serial.println("cannot go that way forwards. must stay between 0 and 4");
-        }
+        } 
       } else if (enc_3_pos < enc_positions[3]) {
-        // Encoder moved counterclockwise
         if (currentHoverOption > 0) {
           currentHoverOption--;
-        } else {
-          Serial.println("cannot go that way backwards. must stay between 0 and 4");
-        }
+        } 
       }
 
-      Serial.print("Currently selected Option: ");
-      Serial.println(currentHoverOption);
-
       hoverOptionSelector();
-      // Update the last known encoder position
       enc_positions[3] = enc_3_pos;
 
       pixels.setPixelColor(3, Wheel((enc_3_pos * 4) & 0xFF));
@@ -340,12 +281,8 @@ void landingPage() {
     }
 
     if (!ss.digitalRead(SS_ENC3_SWITCH)) {
-      Serial.println("ENC3 pressed!");
-      Serial.println("The following option is chosen:");
-      Serial.println(currentHoverOption);
       choosing = false;
     }
-
 
   }
   if (currentHoverOption == 0){
@@ -368,8 +305,6 @@ void landingPage() {
 void hoverOptionSelector() {
     display.clearDisplay();
     setLandingPage();
-    Serial.println("hoveroptionselector");
-    Serial.println(currentHoverOption);
     if (currentHoverOption == 0){
       display.drawCircle(12, 30, 9, 1);
     }
@@ -394,17 +329,13 @@ void settingsPage() {
   Serial.println("Settings details...");
   Serial.println("Press ENC3 to return to the landing menu");
 
-  // Wait for the button to be released if it was pressed
   while (!ss.digitalRead(SS_ENC3_SWITCH)) {
     delay(50);
   }
-
-
   while (true) {
     int buttonState = digitalRead(buttonPin); 
     if (buttonState == LOW) {
       Serial.println("Button pressed!");
-      // Add any additional action you want to perform when the button is pressed
       delay(500); 
       break;
     }
@@ -419,7 +350,6 @@ void RGBPage() {
   Serial.println("Lighting options and details...");
   Serial.println("press ENC3 to return to landing menu");
 
-  // Wait for the button to be released if it was pressed
   while (!ss.digitalRead(SS_ENC3_SWITCH)) {
     // Debounce delay
     delay(50);
@@ -429,7 +359,6 @@ void RGBPage() {
     int buttonState = digitalRead(buttonPin); 
     if (buttonState == LOW) {
       Serial.println("Button pressed!");
-      // Add any additional action you want to perform when the button is pressed
       delay(500); 
       break;
     }
@@ -442,7 +371,6 @@ void audioPage() {
   Serial.println("Audio options and details...");
   Serial.println("press ENC3 to return to landing menu");
 
-  // Wait for the button to be released if it was pressed
   while (!ss.digitalRead(SS_ENC3_SWITCH)) {
     // Debounce delay
     delay(50);
@@ -452,7 +380,6 @@ void audioPage() {
     int buttonState = digitalRead(buttonPin); 
     if (buttonState == LOW) {
       Serial.println("Button pressed!");
-      // Add any additional action you want to perform when the button is pressed
       delay(500); 
       break;
     }
@@ -465,7 +392,6 @@ void EQPage() {
   Serial.println("EQ options and details...");
   Serial.println("press ENC3 to return to landing menu");
 
-  // Wait for the button to be released if it was pressed
   while (!ss.digitalRead(SS_ENC3_SWITCH)) {
     // Debounce delay
     delay(50);
@@ -475,7 +401,6 @@ void EQPage() {
     int buttonState = digitalRead(buttonPin); 
     if (buttonState == LOW) {
       Serial.println("Button pressed!");
-      // Add any additional action you want to perform when the button is pressed
       delay(500); 
       break;
     }
@@ -483,28 +408,19 @@ void EQPage() {
   landingPage();
 }
 
-void FXMainPage() {
-  while (!ss.digitalRead(SS_ENC3_SWITCH)) {
-    // Debounce delay
-    delay(50);
-  }
-  chorusFX();
-  while (true) {
-    int buttonState = digitalRead(buttonPin); 
-    if (buttonState == LOW) {
-      Serial.println("Button pressed!");
-      // Add any additional action you want to perform when the button is pressed
-      delay(500); 
-      break;
-    }
-  }
-  landingPage();
-}
+
 
 void flangeFX() {
     currentEffect = 0;
     while (true) {
-        flangeSetPage();
+        char title[] = {"FX #1 Flange"};
+        setFXTemplatePage(title, flangeActive);
+        display.setCursor(10, 20);
+        display.print("Freq:");
+        display.setCursor(24, 35);
+        display.println(s_freq);
+        display.display();
+        //flangeSetPage();
 
         checkHomeButton();
 
@@ -532,7 +448,16 @@ void flangeFX() {
 void chorusFX() {
     currentEffect = 1;
     while (true) {
-        chorusSetPage();
+        char title[] = {"FX #2 Chorus"};
+        setFXTemplatePage(title, chorusActive);
+        
+        display.setCursor(10, 20);
+        display.print("Voices:");
+        display.setCursor(24, 35);
+        display.println(n_chorus);
+
+        display.display();
+        //chorusSetPage();
 
         checkHomeButton();
 
@@ -557,7 +482,19 @@ void chorusFX() {
 void reverbFX() {
     currentEffect = 2;
     while (true) {
-        ReverbSetPage();
+        char title[] = {"FX #3 Reverb"};
+        setFXTemplatePage(title, reverbActive);
+        display.setCursor(1, 20);
+        display.print("RoomSize:");
+        display.setCursor(15, 35);
+        display.println(revRoomsize);
+        display.setCursor(55, 20);
+        display.print("Damping:");
+        display.setCursor(65, 35);
+        display.println(revDamping);
+
+        display.display();
+        //ReverbSetPage();
 
         checkHomeButton();
 
@@ -582,19 +519,24 @@ void reverbFX() {
           revDamping = revDamping - 0.05;
         }
         freeverb.damping(revDamping);
+        
+        EncToggleCheck(reverbActive, reverb_sw);//Check reverb FX active Toggle
 
-        //Check reverb FX active Toggle
-        EncToggleCheck(reverbActive, reverb_sw);
-
-        //Check FX selected change 
-        cycleFX(3, currentEffect, 3.0, 0.0);
+        cycleFX(3, currentEffect, 3.0, 0.0);//Check FX selected change 
     }
 }
 
 void delayFX() {
     currentEffect = 3;
     while (true) {
-        delaySetPage();
+        char title[] = {"FX #4 Delay"};
+        setFXTemplatePage(title, delayActive);
+        display.setCursor(10, 20);
+        display.print("Time Ms:");
+        display.setCursor(24, 35);
+        display.println(delayTime);
+        display.display();
+        //delaySetPage();
         
         checkHomeButton();
 
@@ -609,11 +551,10 @@ void delayFX() {
         }
         delay1.delay(0, delayTime);
 
-        //Check delay FX active Toggle
-        EncToggleCheck(delayActive, delay_sw);
+        EncToggleCheck(delayActive, delay_sw); //Check delay FX active Toggle
         delay_sw.gain(0, 1);
-        //Check FX selected change 
-        cycleFX(3, currentEffect, 3.0, 0.0);
+         
+        cycleFX(3, currentEffect, 3.0, 0.0);//Check FX selected change
     }
 }
 
@@ -624,7 +565,6 @@ void checkHomeButton() {
   int buttonState = digitalRead(buttonPin); 
 
   if (buttonState == LOW) {
-    Serial.println("Home Button pressed!");
     delay(500); 
     landingPage();
   }
@@ -634,11 +574,8 @@ int EncDialCheck(int encNo, float paramValue, float maxRange, float minRange) {
     int32_t enc_pos = ss.getEncoderPosition(encNo);
     if (enc_positions[0] != enc_pos) {
         int change = enc_pos - enc_positions[encNo];
-
-        // Update the encoder position
         enc_positions[encNo] = enc_pos;
 
-        // Adjust n_chorus based on the change, ensuring it remains within the valid range
         if (change > 0 && paramValue < maxRange) {
             return 2;
         } else if (change < 0 && paramValue > minRange) {
@@ -650,16 +587,12 @@ int EncDialCheck(int encNo, float paramValue, float maxRange, float minRange) {
 
 void EncToggleCheck(bool& FXActive, AudioMixer4& mixer_sw) {
     if (!ss.digitalRead(SS_ENC3_SWITCH)) {
-      Serial.println("ENC3 pressed!");
-      Serial.println("effect is now on");
       if (FXActive == false){
-          Serial.print("effect now ON");
           FXActive = true;
           mixer_sw.gain(0, 0);
           mixer_sw.gain(1, 1);
       }
       else {
-          Serial.print("effect now OFF");
           FXActive = false;
           mixer_sw.gain(0, 1);
           mixer_sw.gain(1, 0);
@@ -672,13 +605,9 @@ void EncToggleCheck(bool& FXActive, AudioMixer4& mixer_sw) {
     }
 }
 
-
-
-
 void cycleFX(int encNo, int param, int maxRange, int minRange) {
     int EncRes;
     EncRes = EncDialCheck(encNo, param, maxRange, minRange);
-    Serial.print(EncRes);
     if (EncRes == 2) {
         FXfunctions[param + 1]();;
     } 
@@ -687,8 +616,14 @@ void cycleFX(int encNo, int param, int maxRange, int minRange) {
     }  
 }
 
+void FXMainPage() {
+  while (!ss.digitalRead(SS_ENC3_SWITCH)) {
+    // Debounce delay
+    delay(50);
+  }
+  FXfunctions[currentEffect]();;
 
-
+}
 
 void testLoadingScreen() {
     display.clearDisplay();
@@ -702,8 +637,6 @@ void testLoadingScreen() {
     display.println("Loading...");
     display.display();
 }
-
-
 
 void setLandingPage() {
     display.clearDisplay();
@@ -738,139 +671,30 @@ void setLandingPage() {
     display.display();
 }
 
-
-
 const uint8_t bitmap21[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7f, 0xff, 0xe0, 0xff, 0xff, 0xf0, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xff, 0xff, 0xf0, 0x7f, 0xff, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-void flangeSetPage() {
-    display.clearDisplay();
-    display.setTextColor(WHITE);
-    display.setTextSize(1);
-    display.setFont(NULL);
-    display.setCursor(0, 10);
-    display.setCursor(0, 5);
-    display.setTextWrap(0);
-    display.setCursor(28, 5);
-    display.println("FX 1# Flange");
-    display.drawLine(0, 18, 128, 18, 1);
-    display.setCursor(10, 20);
-    display.print("Freq:");
-    display.setCursor(24, 35);
-    display.println(s_freq);
-    display.drawRect(109, 50, 17, 12, 1);
-    display.drawTriangle(114, 58, 120, 55, 114, 52, 1);
-    display.drawRect(2, 50, 17, 12, 1);
-    display.drawTriangle(13, 58, 13, 52, 6, 55, 1);
-    display.fillTriangle(114, 58, 120, 55, 114, 52, 1);
-    display.fillTriangle(13, 58, 13, 52, 6, 55, 1);
-    display.drawBitmap(102, -3, bitmap21, 24, 24, 1);
-    if (flangeActive == true){
-      display.fillRoundRect(60, 50, 10, 10, 3, 1);
-    }
-    else {
-      display.drawRoundRect(60, 50, 10, 10, 3, 1);
-    }
-    
-    display.display();
+void setFXTemplatePage(char title[], bool& FXActive) {
+  display.clearDisplay();
+  display.setTextColor(WHITE);
+  display.setTextSize(1);
+  display.setFont(NULL);
+  display.setCursor(0, 10);
+  display.setCursor(0, 5);
+  display.setTextWrap(0);
+  display.setCursor(28, 5);
+  display.println(title);
+  display.drawLine(0, 18, 128, 18, 1);
+  display.drawRect(109, 50, 17, 12, 1);
+  display.drawTriangle(114, 58, 120, 55, 114, 52, 1);
+  display.drawRect(2, 50, 17, 12, 1);
+  display.drawTriangle(13, 58, 13, 52, 6, 55, 1);
+  display.fillTriangle(114, 58, 120, 55, 114, 52, 1);
+  display.fillTriangle(13, 58, 13, 52, 6, 55, 1);
+  display.drawBitmap(102, -3, bitmap21, 24, 24, 1);
+  if (FXActive == true){
+    display.fillRoundRect(60, 50, 10, 10, 3, 1);
+  }
+  else {
+    display.drawRoundRect(60, 50, 10, 10, 3, 1);
+  }
 }
-
-void chorusSetPage() {
-    display.clearDisplay();
-    display.setTextColor(WHITE);
-    display.setTextSize(1);
-    display.setFont(NULL);
-    display.setCursor(0, 10);
-    display.setCursor(0, 5);
-    display.setTextWrap(0);
-    display.setCursor(28, 5);
-    display.println("FX 2# Chorus");
-    display.drawLine(0, 18, 128, 18, 1);
-    display.setCursor(10, 20);
-    display.print("Voices:");
-    display.setCursor(24, 35);
-    display.println(n_chorus);
-    display.drawRect(109, 50, 17, 12, 1);
-    display.drawTriangle(114, 58, 120, 55, 114, 52, 1);
-    display.drawRect(2, 50, 17, 12, 1);
-    display.drawTriangle(13, 58, 13, 52, 6, 55, 1);
-    display.fillTriangle(114, 58, 120, 55, 114, 52, 1);
-    display.fillTriangle(13, 58, 13, 52, 6, 55, 1);
-    display.drawBitmap(102, -3, bitmap21, 24, 24, 1);
-    if (chorusActive == true){
-      display.fillRoundRect(60, 50, 10, 10, 3, 1);
-    }
-    else {
-      display.drawRoundRect(60, 50, 10, 10, 3, 1);
-    }
-    
-    display.display();
-}
-
-void ReverbSetPage() {
-    display.clearDisplay();
-    display.setTextColor(WHITE);
-    display.setTextSize(1);
-    display.setFont(NULL);
-    display.setCursor(0, 10);
-    display.setCursor(0, 5);
-    display.setTextWrap(0);
-    display.setCursor(28, 5);
-    display.println("FX 3# Reverb");
-    display.drawLine(0, 18, 128, 18, 1);
-    display.setCursor(1, 20);
-    display.print("RoomSize:");
-    display.setCursor(15, 35);
-    display.println(revRoomsize);
-    display.setCursor(55, 20);
-    display.print("Damping:");
-    display.setCursor(65, 35);
-    display.println(revDamping);
-    display.drawRect(109, 50, 17, 12, 1);
-    display.drawTriangle(114, 58, 120, 55, 114, 52, 1);
-    display.drawRect(2, 50, 17, 12, 1);
-    display.drawTriangle(13, 58, 13, 52, 6, 55, 1);
-    display.fillTriangle(114, 58, 120, 55, 114, 52, 1);
-    display.fillTriangle(13, 58, 13, 52, 6, 55, 1);
-    display.drawBitmap(102, -3, bitmap21, 24, 24, 1);
-    if (reverbActive == true){
-      display.fillRoundRect(60, 50, 10, 10, 3, 1);
-    }
-    else {
-      display.drawRoundRect(60, 50, 10, 10, 3, 1);
-    }
-    display.display();
-}
-
-
-void delaySetPage() {
-    display.clearDisplay();
-    display.setTextColor(WHITE);
-    display.setTextSize(1);
-    display.setFont(NULL);
-    display.setCursor(0, 10);
-    display.setCursor(0, 5);
-    display.setTextWrap(0);
-    display.setCursor(28, 5);
-    display.println("FX 4# Delay");
-    display.drawLine(0, 18, 128, 18, 1);
-    display.setCursor(10, 20);
-    display.print("Time Ms:");
-    display.setCursor(24, 35);
-    display.println(delayTime);
-    display.drawRect(109, 50, 17, 12, 1);
-    display.drawTriangle(114, 58, 120, 55, 114, 52, 1);
-    display.drawRect(2, 50, 17, 12, 1);
-    display.drawTriangle(13, 58, 13, 52, 6, 55, 1);
-    display.fillTriangle(114, 58, 120, 55, 114, 52, 1);
-    display.fillTriangle(13, 58, 13, 52, 6, 55, 1);
-    display.drawBitmap(102, -3, bitmap21, 24, 24, 1);
-    if (delayActive == true){
-      display.fillRoundRect(60, 50, 10, 10, 3, 1);
-    }
-    else {
-      display.drawRoundRect(60, 50, 10, 10, 3, 1);
-    }
-    display.display();
-}
-
-
