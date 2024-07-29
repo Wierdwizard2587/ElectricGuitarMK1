@@ -1,0 +1,59 @@
+//AUX general values
+currentAuxPage=0
+
+//main audio values
+auxOutOpt=0
+HPVol=0.0
+SPVol=0.0
+AUXVol=0.0
+gainOut=13
+
+//backing track audio values
+backingActive=false
+backingVol=0.5
+
+//FX general values
+currentEffect=2
+
+//flange values
+flangeActive=true
+s_freq=0.5
+
+//chorus values
+chorusActive=true
+n_chorus=2
+
+//reverb values
+reverbActive=true
+revRoomsize=0.0
+revDamping=0.0
+
+//delay values
+delayActive=true
+delayTime=200
+
+// EQ general values
+currentEQPage=0
+
+//EQ 5 band values
+EQActive=false
+bassBand=0.0
+midBassBand=0.0
+midRangeBand=0.0
+midTrebleBand=0.0
+trebleBand=0.0
+
+//EQ bass values
+bassBoostActive=false
+lr_lev=0.0
+bass_lev=0.5
+hpf_bypass=0
+cutoff=6
+
+//rgb values
+rgbActive=false
+rgbBrightness=0.0
+
+//settings values
+screenBrightness=0.0
+softwareVer=v0.4.0

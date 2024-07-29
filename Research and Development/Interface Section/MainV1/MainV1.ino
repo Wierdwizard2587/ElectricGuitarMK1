@@ -27,7 +27,6 @@
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, OLED_RESET);
 
-#define NUMFLAKES     10 // Number of snowflakes in the animation example
 
 #define LOGO_HEIGHT   16
 #define LOGO_WIDTH    16
@@ -74,11 +73,9 @@ const uint8_t bitmap37[] = {0x00, 0x00, 0x00,
                             0x00, 0x00, 0x00, 
                             0x00, 0x00, 0x00};
 
-#include <Audio.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <SD.h>
-#include <SerialFlash.h>
+
+#include <regex>
+
 
 // GUItool: begin automatically generated code
 AudioInputI2S            i2s1_in;           //xy=466.11112213134766,339.28570556640625
@@ -115,27 +112,30 @@ AudioControlSGTL5000     audioShield;     //xy=1157.3333206176758,200.2222423553
 
 const int inputChSelect = AUDIO_INPUT_LINEIN;
 
+const int chipSelect = 10;
+
 // audio shield volume
-int masterVolume        = 0;
+float masterVolume  = 0.0;
+int gainOut = 13;
 
 #define FLANGE_DELAY_LENGTH (6*AUDIO_BLOCK_SAMPLES)
 short flange_delayline[FLANGE_DELAY_LENGTH];
 int s_idx = FLANGE_DELAY_LENGTH/4;
 int s_depth = FLANGE_DELAY_LENGTH/4;
 double s_freq = .5;
-bool flangeActive = false;
+bool flangeActive;
 
 
 #define chorusDelayLength (16*AUDIO_BLOCK_SAMPLES)  // Number of samples in each delay line
 short l_delayline[chorusDelayLength]; // Allocate the delay lines for left and right channels
 int   n_chorus = 2;                   // number of "voices" in the chorus including the original voice
-bool  chorusActive = false;  
+bool chorusActive;  
 
-bool reverbActive = false;
+bool reverbActive;
 float revRoomsize = 0.0;
 float revDamping = 0.0;
 
-bool delayActive = false;
+bool delayActive;
 int delayTime = 0;
 
 Adafruit_seesaw ss = Adafruit_seesaw(&Wire1);
@@ -145,17 +145,51 @@ int32_t enc_positions[4] = {0, 0, 0, 0};
 
 const int buttonPin = 14;
 
+//General FX Variables
 int currentEffect;
 float param;
 int fxEncRes;
 
+//Audio section Variables
+int currentAuxPage;
+bool backingActive = false;
+float backingVol = 0.5;
+
+//landing page Variables
 int currentHoverOption = 0;
+
+
+
+float HPVol;
+float SPVol;
+float AUXVol;
+bool EQActive = false;
+float bassBand;
+float midBassBand;
+float midRangeBand;
+float midTrebleBand;
+float trebleBand;
+bool bassBoostActive = false;
+float lr_lev;
+float bass_lev;
+int hpf_bypass;
+int cutoff;
+bool rgbActive = false;
+float rgbBrightness;
+int auxOutOpt;
+int currentEQPage;
+float screenBrightness;
+String softwareVer;
+
 void setup() {
+
+  Serial.begin(115200);
+  while (!Serial) delay(10);
 
 
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
     Serial.println(F("SSD1306 allocation failed"));
-    for(;;); // Don't proceed, loop forever
+    for(;;);
   }
 
   // Show initial display buffer contents on the screen --
@@ -163,16 +197,21 @@ void setup() {
   display.display();
   testLoadingScreen();
 
-  Serial.begin(115200);
-  while (!Serial) delay(10);
+  if (!SD.begin(chipSelect)) {
+    Serial.println("SD card initialization failed!");
+    return;
+  }
+
+  String filename = "data.txt";
+  readStoredValues();
 
 
   AudioMemory(250);
 
-  // Comment these out if not using the audio adaptor board.
   audioShield.enable();
-  audioShield.inputSelect(inputChSelect);  // select mic or line-in for audio shield input source
-  audioShield.volume(0.7);
+  audioShield.inputSelect(inputChSelect); 
+  audioShield.volume(masterVolume);
+  audioShield.lineOutLevel(gainOut);
 
   flange_sw.gain(0, 1);
   flange_sw.gain(1, 0);
@@ -235,6 +274,270 @@ void setup() {
   pixels.setBrightness(255);
   pixels.show();
 }
+//set sketch variables their value from the txt file
+void readStoredValues() {
+  String variables[] = {};
+
+
+  File dataFile = SD.open("data.txt");
+  if (dataFile) {
+    Serial.println("data.txt opened successfully.");
+
+      // Read each line from the file
+    while (dataFile.available()) {
+      String line = readLine(dataFile);
+      
+      // Skip empty lines or lines starting with //
+      if (line.length() > 0 && !line.startsWith("//")) {
+        Serial.println(line);
+        parseAndUpdate(line);
+      }
+    }
+
+    dataFile.close();
+    Serial.println("data.txt closed.");
+  } else {
+    Serial.println("Error opening data.txt");
+  }
+}
+
+String readLine(File &file) {
+  String line = "";
+  while (file.available()) {
+    char c = file.read();
+    if (c == '\n') {
+      break; // End of line
+    }
+    line += c;
+  }
+  return line;
+}
+
+void parseAndUpdate(const String& line) {
+  String key;
+  String value;
+
+  int equalsIndex = line.indexOf("=");
+  if (equalsIndex == -1) return;
+
+  key = line.substring(0, equalsIndex);
+  value = line.substring(equalsIndex + 1);
+
+  Serial.println(key);
+  Serial.println(value);
+
+  updateVariableByName(key, value);
+
+}
+
+// Structure to hold variable information
+struct Variable {
+  String name;
+  void* pointer;
+  void (*updateFunction)(void*, const String&);
+};
+
+// Update functions for different types
+void updateFloat(void* ptr, const String& value) {
+  Serial.println("float var");
+  *(float*)ptr = value.toFloat();
+}
+
+void updateInt(void* ptr, const String& value) {
+  Serial.println("int var");
+  *(int*)ptr = value.toInt();
+}
+
+void updateString(void* ptr, const String& value) {
+  Serial.println("String var");
+  *(String*)ptr = value;
+}
+
+void updateBool(void* ptr, const String& value) {
+  Serial.println("bool var");
+  Serial.print("Value read: '");
+  Serial.print(value);
+  Serial.println("'");
+
+  String trimmedValue = value;
+  trimmedValue.trim();
+  trimmedValue.toLowerCase();
+  if (trimmedValue.equals("true")) {
+    Serial.println("is true!!");
+    *(bool*)ptr = true;
+  } 
+  else if (trimmedValue.equals("false")) {
+    Serial.println("is false!!");
+    *(bool*)ptr = false;
+  } 
+  else {
+    Serial.println("Unknown bool value");
+  }
+}
+
+Variable variables[] = {
+    {"currentAuxPage", &currentAuxPage, updateInt},
+    {"auxOutOpt", &auxOutOpt, updateInt},
+    {"HPVol", &HPVol, updateFloat},
+    {"SPVol", &SPVol, updateFloat},
+    {"AUXVol", &AUXVol, updateFloat},
+    {"gainOut", &gainOut, updateInt},
+    {"backingActive", &backingActive, updateBool},
+    {"backingVol", &backingVol, updateFloat},
+    {"currentEffect", &currentEffect, updateInt},
+    {"flangeActive", &flangeActive, updateBool},
+    {"s_freq", &s_freq, updateFloat},
+    {"chorusActive", &chorusActive, updateBool},
+    {"n_chorus", &n_chorus, updateInt},
+    {"reverbActive", &reverbActive, updateBool},
+    {"revRoomsize", &revRoomsize, updateFloat},
+    {"revDamping", &revDamping, updateFloat},
+    {"delayActive", &delayActive, updateBool},
+    {"delayTime", &delayTime, updateInt},
+    {"currentEQPage", &currentEQPage, updateInt},
+    {"EQActive", &EQActive, updateBool},
+    {"bassBand", &bassBand, updateFloat},
+    {"midBassBand", &midBassBand, updateFloat},
+    {"midRangeBand", &midRangeBand, updateFloat},
+    {"midTrebleBand", &midTrebleBand, updateFloat},
+    {"trebleBand", &trebleBand, updateFloat},
+    {"bassBoostActive", &bassBoostActive, updateBool},
+    {"lr_lev", &lr_lev, updateFloat},
+    {"bass_lev", &bass_lev, updateFloat},
+    {"hpf_bypass", &hpf_bypass, updateInt},
+    {"cutoff", &cutoff, updateInt},
+    {"rgbActive", &rgbActive, updateBool},
+    {"rgbBrightness", &rgbBrightness, updateFloat},
+    {"screenBrightness", &screenBrightness, updateFloat},
+    {"softwareVer", &softwareVer, updateString}
+  };
+
+const int numVariables = sizeof(variables) / sizeof(variables[0]);
+
+void updateVariableByName(const String& name, const String& value) {
+  for (int i = 0; i < numVariables; i++) {
+    if (variables[i].name == name) {
+      // Call the update function associated with the variable
+      variables[i].updateFunction(variables[i].pointer, value);
+      return;
+    }
+  }
+  Serial.print("Variable name '");
+  Serial.print(name);
+  Serial.println("' not found.");
+}
+void runFileUpdate(const String& key, const String& val){  
+  readFile();
+  updateFile(key, val);
+}
+
+//update variables to txt file
+void readFile() {
+  File file = SD.open("data.txt");
+  if (!file) {
+    Serial.println("Failed to open file for reading.");
+    return;
+  }
+
+  Serial.println("Reading file content:");
+  while (file.available()) {
+    Serial.write(file.read());
+  }
+  file.close();
+}
+
+void updateFile(const String& key, const String& newValue) {
+  File file = SD.open("data.txt", FILE_READ);
+  if (!file) {
+    Serial.println("Failed to open file for reading.");
+    return;
+  }
+
+  // Read file content into a String
+  String fileContent;
+  while (file.available()) {
+    fileContent += (char)file.read();
+  }
+  file.close();
+
+  // Find and replace the key with the new value
+  int keyIndex = fileContent.indexOf(key);
+  if (keyIndex != -1) {
+    int valueStart = keyIndex + key.length() + 1; // Assuming a format like "key=value"
+    int valueEnd = fileContent.indexOf('\n', valueStart);
+    if (valueEnd == -1) valueEnd = fileContent.length();
+    fileContent = fileContent.substring(0, valueStart) + newValue + fileContent.substring(valueEnd);
+  }
+
+  // Write the updated content back to the file
+  file = SD.open("data.txt", FILE_WRITE);
+  if (!file) {
+    Serial.println("Failed to open file for writing.");
+    return;
+  }
+
+  file.println(fileContent);
+  file.close();
+  Serial.println("File updated.");
+}
+
+struct VarList {
+  String key;
+  String value;
+};
+VarList VarsToUpdate[3] = {{"", ""}, {"", ""}, {"", ""}};
+
+void storeVarsToUpdate(String key, String Value) {
+  for (int i = 0; i < 3; i++) {
+    Serial.println(i);
+    Serial.println(VarsToUpdate[i].key);
+    Serial.println(VarsToUpdate[i].value);
+  }
+
+  for (int i = 0; i < 3; i++) {
+    if (VarsToUpdate[i].key == key) {
+      VarsToUpdate[i].value = Value;
+      Serial.println("variable already in array ready to be added. value updated");
+      updateFileVar(key);
+      return;
+    }
+  }
+  for (int k = 0; k < 3; k++) {
+    if (VarsToUpdate[k].key == "") {
+      VarsToUpdate[k].key = key;
+      VarsToUpdate[k].value = Value;
+      Serial.println("added key and value added to array");
+      updateFileVar(key);
+      return;
+    }
+  }
+  
+}
+
+void updateFileVar(String varName) {
+  Serial.println("update file function");
+  Serial.println(VarsToUpdate[2].key);
+  Serial.println(varName);
+  if (varName == VarsToUpdate[2].key) {
+        Serial.println("THERE ARE 3 VALUES. NOW UPDATING");
+          for (int i = 0; i < 3; i++) {
+            Serial.println("### uploading ##");
+            Serial.println(VarsToUpdate[i].key);
+            Serial.println(VarsToUpdate[i].value);
+
+            runFileUpdate(VarsToUpdate[i].key, VarsToUpdate[i].value);
+          }
+        
+          clearArray();
+        }     
+  }
+
+void clearArray() {
+  for (int i = 0; i < 3; i++) {
+    VarsToUpdate[i].key = "";
+    VarsToUpdate[i].value = "";
+  }
+}
 
 void loop() {
   landingPage();
@@ -253,6 +556,8 @@ uint32_t Wheel(byte WheelPos) {
   return seesaw_NeoPixel::Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
+typedef void (*FunctionPointer)();
+FunctionPointer landingFunctions[] = { FXMainPage, EQPage, audioPage, RGBPage, settingsPage };
 
 void landingPage() { 
   hoverOptionSelector();
@@ -260,46 +565,25 @@ void landingPage() {
   bool choosing = true;
 
   while (choosing == true) {
-    int32_t enc_3_pos = ss.getEncoderPosition(3);
-    if (enc_positions[3] != enc_3_pos) {
-
-      if (enc_3_pos > enc_positions[3]) {
-        if (currentHoverOption < 4) { 
-          currentHoverOption++;
-        } 
-      } else if (enc_3_pos < enc_positions[3]) {
-        if (currentHoverOption > 0) {
-          currentHoverOption--;
-        } 
-      }
-
+    int EncRes;
+    //current option Control Encoder Check
+    param = currentHoverOption;
+    EncRes = EncDialCheck(3, param, 4.0, 0.0);
+    if (EncRes == 2) {
+      currentHoverOption++;
       hoverOptionSelector();
-      enc_positions[3] = enc_3_pos;
-
-      pixels.setPixelColor(3, Wheel((enc_3_pos * 4) & 0xFF));
-      pixels.show();
+    } 
+    if (EncRes == 1) {
+      currentHoverOption--;
+      hoverOptionSelector();
     }
-
+    
     if (!ss.digitalRead(SS_ENC3_SWITCH)) {
       choosing = false;
     }
+  }
 
-  }
-  if (currentHoverOption == 0){
-    FXMainPage();
-  }
-  if (currentHoverOption == 1){
-    EQPage();
-  }
-  if (currentHoverOption == 2){
-    audioPage();
-  }
-  if (currentHoverOption == 3){
-    RGBPage();
-  }
-  if (currentHoverOption == 4){
-    settingsPage();
-  }
+  landingFunctions[currentHoverOption]();;
 }
 
 void hoverOptionSelector() {
@@ -325,131 +609,212 @@ void hoverOptionSelector() {
 
 
 void settingsPage() {
-  Serial.println("**************Settings Page**************");
-  Serial.println("Settings details...");
-  Serial.println("Press ENC3 to return to the landing menu");
-
   while (!ss.digitalRead(SS_ENC3_SWITCH)) {
     delay(50);
   }
+
   while (true) {
-    int buttonState = digitalRead(buttonPin); 
-    if (buttonState == LOW) {
-      Serial.println("Button pressed!");
-      delay(500); 
-      break;
-    }
+    char title[] = {"Settings"};
+    bool notFX = false;
+    setFXTemplatePage(title, notFX, false);
+
+    display.display();
+    checkHomeButton();
   }
-  landingPage();
-  
 }
 
 
 void RGBPage() {
-  Serial.println("**************RGB Lighting Page**************");
-  Serial.println("Lighting options and details...");
-  Serial.println("press ENC3 to return to landing menu");
-
   while (!ss.digitalRead(SS_ENC3_SWITCH)) {
-    // Debounce delay
     delay(50);
   }
-
   while (true) {
-    int buttonState = digitalRead(buttonPin); 
-    if (buttonState == LOW) {
-      Serial.println("Button pressed!");
-      delay(500); 
-      break;
-    }
+    char title[] = {"RGB Lighting"};
+    bool notFX = false;
+    setFXTemplatePage(title, notFX, false);
+
+    display.display();
+    checkHomeButton();
   }
-  landingPage();
 }
 
-void audioPage() {
-  Serial.println("**************Audio Controls Page**************");
-  Serial.println("Audio options and details...");
-  Serial.println("press ENC3 to return to landing menu");
-
+void masterAuxPage() {
   while (!ss.digitalRead(SS_ENC3_SWITCH)) {
+    delay(50);
+  }
+  currentAuxPage = 0;
+  while (true) {
+    char title[] = {"Aux #1 Master Vol"};
+    bool notFX = false;
+    setFXTemplatePage(title, notFX, false);
+    display.setCursor(1, 20);
+    display.print("MasVol:");
+    display.setCursor(10, 35);
+    display.println(masterVolume);
+    display.setCursor(55, 20);
+    display.print("Gain:");
+    display.setCursor(60, 35);
+    display.println(gainOut);
+    display.display();
+
+    checkHomeButton();
+
+    //Master volume Control Encoder Check
+    int EncRes;
+    param = masterVolume;
+    EncRes = EncDialCheck(0, param, 1.0, 0.0);
+    if (EncRes == 2) {
+      masterVolume = masterVolume + 0.05;
+      audioShield.volume(masterVolume);
+    } 
+    if (EncRes == 1) {
+      masterVolume = masterVolume - 0.05;
+      audioShield.volume(masterVolume);
+    }
+    //Master Gain out Control Encoder Check
+    param = gainOut;
+    EncRes = EncDialCheck(1, param, 31, 13);
+    if (EncRes == 2) {
+      gainOut = gainOut + 1;
+      audioShield.lineOutLevel(gainOut);
+    } 
+    if (EncRes == 1) {
+      gainOut = gainOut - 1;
+      audioShield.lineOutLevel(gainOut);
+    }
+
+
+
+    cycleAux(3, currentAuxPage, 1.0, 0.0);//Check FX selected change 
+    
+  }
+}
+
+
+void backTrackAuxPage() {
+  while (!ss.digitalRead(SS_ENC3_SWITCH)) {
+    delay(50);
+  }
+  currentAuxPage = 1;
+  while (true) {
+    char title[] = {"Aux #2 Back Track"};
+    bool notFX = false;
+    setFXTemplatePage(title, notFX, false);
+    display.setCursor(1, 20);
+    display.print("Line I/O:");
+    display.setCursor(10, 35);
+    display.println(backingActive);
+    display.setCursor(55, 20);
+    display.print("BackVol:");
+    display.setCursor(60, 35);
+    display.println(gainOut);
+    display.display();
+
+    checkHomeButton();
+
+    //Master volume Control Encoder Check
+    int EncRes;
+    param = masterVolume;
+    EncRes = EncDialCheck(0, param, 1.0, 0.0);
+    if (EncRes == 2) {
+      masterVolume = masterVolume + 0.05;
+      audioShield.volume(masterVolume);
+    } 
+    if (EncRes == 1) {
+      masterVolume = masterVolume - 0.05;
+      audioShield.volume(masterVolume);
+    }
+    //Master Gain out Control Encoder Check
+    param = gainOut;
+    EncRes = EncDialCheck(1, param, 31, 13);
+    if (EncRes == 2) {
+      gainOut = gainOut + 1;
+      audioShield.lineOutLevel(gainOut);
+    } 
+    if (EncRes == 1) {
+      gainOut = gainOut - 1;
+      audioShield.lineOutLevel(gainOut);
+    }
+
+
+
+    cycleAux(3, currentAuxPage, 1.0, 0.0);//Check Aux selected change 
+    
+  }
+}
+typedef void (*FunctionPointer)();
+FunctionPointer auxFunctions[] = { masterAuxPage, backTrackAuxPage  };
+
+void audioPage() {
+    while (!ss.digitalRead(SS_ENC3_SWITCH)) {
     // Debounce delay
     delay(50);
   }
+  auxFunctions[currentAuxPage]();;
+}
 
-  while (true) {
-    int buttonState = digitalRead(buttonPin); 
-    if (buttonState == LOW) {
-      Serial.println("Button pressed!");
-      delay(500); 
-      break;
-    }
-  }
-  landingPage();  
+void cycleAux(int encNo, int param, int maxRange, int minRange) {
+    int EncRes;
+    EncRes = EncDialCheck(encNo, param, maxRange, minRange);
+    if (EncRes == 2) {
+        auxFunctions[param + 1]();;
+    } 
+    if (EncRes == 1) {
+        auxFunctions[param - 1]();;
+    }  
 }
 
 void EQPage() {
-  Serial.println("**************EQ Controls Page**************");
-  Serial.println("EQ options and details...");
-  Serial.println("press ENC3 to return to landing menu");
-
   while (!ss.digitalRead(SS_ENC3_SWITCH)) {
-    // Debounce delay
     delay(50);
   }
-
   while (true) {
-    int buttonState = digitalRead(buttonPin); 
-    if (buttonState == LOW) {
-      Serial.println("Button pressed!");
-      delay(500); 
-      break;
-    }
+    char title[] = {"EQ"};
+    bool notFX = false;
+    setFXTemplatePage(title, notFX, false);
+
+    display.display();
+    checkHomeButton();
   }
-  landingPage();
 }
-
-
 
 void flangeFX() {
     currentEffect = 0;
     while (true) {
         char title[] = {"FX #1 Flange"};
-        setFXTemplatePage(title, flangeActive);
+        setFXTemplatePage(title, flangeActive, true);
         display.setCursor(10, 20);
         display.print("Freq:");
         display.setCursor(24, 35);
         display.println(s_freq);
         display.display();
-        //flangeSetPage();
 
         checkHomeButton();
-
         //flange Freq Control Encoder Check
         param = s_freq;
         fxEncRes = EncDialCheck(0, param, 5.0, 0.0);
         if (fxEncRes == 2) {
           s_freq = s_freq + 0.1;
+          flange.voices(s_idx,s_depth,s_freq);
+          storeVarsToUpdate("s_freq", String(s_freq));
         } 
         if (fxEncRes == 1) {
           s_freq = s_freq - 0.1;
-        }
-        flange.voices(s_idx,s_depth,s_freq);
-
-
+          flange.voices(s_idx,s_depth,s_freq);
+          storeVarsToUpdate("s_freq", String(s_freq));
+        } 
         //Check flange FX active Toggle
         EncToggleCheck(flangeActive, flange_sw);
-
         //Check FX selected change 
         cycleFX(3, currentEffect, 3.0, 0.0);
     }
 }
 
-
 void chorusFX() {
     currentEffect = 1;
     while (true) {
         char title[] = {"FX #2 Chorus"};
-        setFXTemplatePage(title, chorusActive);
+        setFXTemplatePage(title, chorusActive, true);
         
         display.setCursor(10, 20);
         display.print("Voices:");
@@ -457,33 +822,31 @@ void chorusFX() {
         display.println(n_chorus);
 
         display.display();
-        //chorusSetPage();
-
         checkHomeButton();
-
         //chorus Voice amount Control Encoder Check
         param = n_chorus;
         fxEncRes = EncDialCheck(0, param, 16, 2);
         if (fxEncRes == 2) {
           n_chorus++;
+          chorus.voices(n_chorus);
+          storeVarsToUpdate("n_chorus", String(delayTime));
         } 
         if (fxEncRes == 1) {
           n_chorus--;
+          chorus.voices(n_chorus);
+          storeVarsToUpdate("n_chorus", String(delayTime));
         }
-        chorus.voices(n_chorus);
-
-        EncToggleCheck(chorusActive, chorus_sw); //Check Chorus FX active Toggle
         
+        EncToggleCheck(chorusActive, chorus_sw); //Check Chorus FX active Toggle
         cycleFX(3, currentEffect, 3.0, 0.0); //Check FX selected change 
     }
 }
-
 
 void reverbFX() {
     currentEffect = 2;
     while (true) {
         char title[] = {"FX #3 Reverb"};
-        setFXTemplatePage(title, reverbActive);
+        setFXTemplatePage(title, reverbActive, true);
         display.setCursor(1, 20);
         display.print("RoomSize:");
         display.setCursor(15, 35);
@@ -494,8 +857,6 @@ void reverbFX() {
         display.println(revDamping);
 
         display.display();
-        //ReverbSetPage();
-
         checkHomeButton();
 
         //Reverb Room Size Control Encoder Check
@@ -503,53 +864,60 @@ void reverbFX() {
         fxEncRes = EncDialCheck(0, param, 1.0, 0.0);
         if (fxEncRes == 2) {
           revRoomsize = revRoomsize + 0.05;
+          freeverb.roomsize(revRoomsize);
+          storeVarsToUpdate("revRoomsize", String(revRoomsize));
         } 
         if (fxEncRes == 1) {
           revRoomsize = revRoomsize - 0.05;
+          freeverb.roomsize(revRoomsize);
+          storeVarsToUpdate("revRoomsize", String(revRoomsize));
         }
-        freeverb.roomsize(revRoomsize);
+        
 
         //Reverb Damping Control Encoder Check
         param = revDamping;
         fxEncRes = EncDialCheck(1, param, 1.0, 0.0);
         if (fxEncRes == 2) {
           revDamping = revDamping + 0.05;
+          freeverb.damping(revDamping);
         } 
         if (fxEncRes == 1) {
           revDamping = revDamping - 0.05;
+          freeverb.damping(revDamping);
         }
-        freeverb.damping(revDamping);
         
         EncToggleCheck(reverbActive, reverb_sw);//Check reverb FX active Toggle
-
         cycleFX(3, currentEffect, 3.0, 0.0);//Check FX selected change 
     }
 }
+
 
 void delayFX() {
     currentEffect = 3;
     while (true) {
         char title[] = {"FX #4 Delay"};
-        setFXTemplatePage(title, delayActive);
+        setFXTemplatePage(title, delayActive, true);
         display.setCursor(10, 20);
         display.print("Time Ms:");
         display.setCursor(24, 35);
         display.println(delayTime);
         display.display();
-        //delaySetPage();
         
         checkHomeButton();
-
         //Delay time Control Encoder Check
         param = delayTime;
         fxEncRes = EncDialCheck(0, param, 1000, 0);
         if (fxEncRes == 2) {
           delayTime = delayTime + 50;
+          delay1.delay(0, delayTime);
+          runFileUpdate("delayTime", String(delayTime));
         } 
         if (fxEncRes == 1) {
           delayTime = delayTime - 50;
+          delay1.delay(0, delayTime);
+          runFileUpdate("delayTime", String(delayTime));
         }
-        delay1.delay(0, delayTime);
+        
 
         EncToggleCheck(delayActive, delay_sw); //Check delay FX active Toggle
         delay_sw.gain(0, 1);
@@ -563,7 +931,6 @@ FunctionPointer FXfunctions[] = { flangeFX, chorusFX, reverbFX, delayFX  };
 
 void checkHomeButton() {
   int buttonState = digitalRead(buttonPin); 
-
   if (buttonState == LOW) {
     delay(500); 
     landingPage();
@@ -600,7 +967,6 @@ void EncToggleCheck(bool& FXActive, AudioMixer4& mixer_sw) {
     }
 
     while (!ss.digitalRead(SS_ENC3_SWITCH)) {
-    // Debounce delay
     delay(50);
     }
 }
@@ -673,7 +1039,7 @@ void setLandingPage() {
 
 const uint8_t bitmap21[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7f, 0xff, 0xe0, 0xff, 0xff, 0xf0, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xff, 0xff, 0xf0, 0x7f, 0xff, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-void setFXTemplatePage(char title[], bool& FXActive) {
+void setFXTemplatePage(char title[], bool& FXActive, bool fxCheck) {
   display.clearDisplay();
   display.setTextColor(WHITE);
   display.setTextSize(1);
@@ -691,10 +1057,15 @@ void setFXTemplatePage(char title[], bool& FXActive) {
   display.fillTriangle(114, 58, 120, 55, 114, 52, 1);
   display.fillTriangle(13, 58, 13, 52, 6, 55, 1);
   display.drawBitmap(102, -3, bitmap21, 24, 24, 1);
-  if (FXActive == true){
-    display.fillRoundRect(60, 50, 10, 10, 3, 1);
-  }
-  else {
-    display.drawRoundRect(60, 50, 10, 10, 3, 1);
+  if (fxCheck) {
+    if (FXActive == true){
+      display.fillRoundRect(60, 50, 10, 10, 3, 1);
+    }
+    else {
+      display.drawRoundRect(60, 50, 10, 10, 3, 1);
+    }
   }
 }
+
+
+
