@@ -426,48 +426,53 @@ void updateVariableByName(const String& name, const String& value) {
   Serial.print(name);
   Serial.println("' not found.");
 }
-void runFileUpdate(const String& key, const String& val){  
-  readFile();
-  updateFile(key, val);
-}
+//blanket update all values in txt file with their variables value in the program
+void writeUpdatedValues() {
 
-//update variables to txt file
-void readFile() {
-  File file = SD.open("data.txt");
-  if (!file) {
-    Serial.println("Failed to open file for reading.");
-    return;
-  }
-
-  Serial.println("Reading file content:");
-  while (file.available()) {
-    Serial.write(file.read());
-  }
-  file.close();
-}
-
-void updateFile(const String& key, const String& newValue) {
   File file = SD.open("data.txt", FILE_READ);
   if (!file) {
     Serial.println("Failed to open file for reading.");
     return;
   }
 
-  // Read file content into a String
   String fileContent;
   while (file.available()) {
     fileContent += (char)file.read();
   }
   file.close();
 
-  // Find and replace the key with the new value
-  int keyIndex = fileContent.indexOf(key);
-  if (keyIndex != -1) {
-    int valueStart = keyIndex + key.length() + 1; // Assuming a format like "key=value"
-    int valueEnd = fileContent.indexOf('\n', valueStart);
-    if (valueEnd == -1) valueEnd = fileContent.length();
-    fileContent = fileContent.substring(0, valueStart) + newValue + fileContent.substring(valueEnd);
+  // Update the file content with new variable values
+  for (int i = 0; i < numVariables; i++) {
+    String key = variables[i].name;
+    String newValue;
+    void* ptr = variables[i].pointer;
+
+    if (ptr == nullptr) continue;
+
+    if (variables[i].updateFunction == updateFloat) {
+      newValue = String(*(float*)ptr, 6);
+    } else if (variables[i].updateFunction == updateInt) {
+      newValue = String(*(int*)ptr);
+    } else if (variables[i].updateFunction == updateString) {
+      newValue = *(String*)ptr;
+    } else if (variables[i].updateFunction == updateBool) {
+      newValue = (*(bool*)ptr) ? "true" : "false";
+    }
+
+    int keyIndex = fileContent.indexOf(key + "=");
+    if (keyIndex != -1) {
+      int valueStart = keyIndex + key.length() + 1;
+      int valueEnd = fileContent.indexOf('\n', valueStart);
+      if (valueEnd == -1) valueEnd = fileContent.length();
+      fileContent = fileContent.substring(0, valueStart) + newValue + fileContent.substring(valueEnd);
+    } else {
+      fileContent += "\n" + key + "=" + newValue;
+    }
   }
+
+  // Debug: Print the updated file content
+  Serial.println("Updated file content:");
+  Serial.println(fileContent);
 
   // Write the updated content back to the file
   file = SD.open("data.txt", FILE_WRITE);
@@ -476,68 +481,11 @@ void updateFile(const String& key, const String& newValue) {
     return;
   }
 
-  file.println(fileContent);
+  file.print(fileContent);
   file.close();
-  Serial.println("File updated.");
+  Serial.println("File updated successfully.");
 }
 
-struct VarList {
-  String key;
-  String value;
-};
-VarList VarsToUpdate[3] = {{"", ""}, {"", ""}, {"", ""}};
-
-void storeVarsToUpdate(String key, String Value) {
-  for (int i = 0; i < 3; i++) {
-    Serial.println(i);
-    Serial.println(VarsToUpdate[i].key);
-    Serial.println(VarsToUpdate[i].value);
-  }
-
-  for (int i = 0; i < 3; i++) {
-    if (VarsToUpdate[i].key == key) {
-      VarsToUpdate[i].value = Value;
-      Serial.println("variable already in array ready to be added. value updated");
-      updateFileVar(key);
-      return;
-    }
-  }
-  for (int k = 0; k < 3; k++) {
-    if (VarsToUpdate[k].key == "") {
-      VarsToUpdate[k].key = key;
-      VarsToUpdate[k].value = Value;
-      Serial.println("added key and value added to array");
-      updateFileVar(key);
-      return;
-    }
-  }
-  
-}
-
-void updateFileVar(String varName) {
-  Serial.println("update file function");
-  Serial.println(VarsToUpdate[2].key);
-  Serial.println(varName);
-  if (varName == VarsToUpdate[2].key) {
-        Serial.println("THERE ARE 3 VALUES. NOW UPDATING");
-          for (int i = 0; i < 3; i++) {
-            Serial.println("### uploading ##");
-            Serial.println(VarsToUpdate[i].key);
-            Serial.println(VarsToUpdate[i].value);
-
-            runFileUpdate(VarsToUpdate[i].key, VarsToUpdate[i].value);
-          }
-        
-          clearArray();
-        }     
-  }
-
-void clearArray() {
-  for (int i = 0; i < 3; i++) {
-    VarsToUpdate[i].key = "";
-    VarsToUpdate[i].value = "";
-  }
-}
 
 void loop() {
   landingPage();
@@ -796,12 +744,10 @@ void flangeFX() {
         if (fxEncRes == 2) {
           s_freq = s_freq + 0.1;
           flange.voices(s_idx,s_depth,s_freq);
-          storeVarsToUpdate("s_freq", String(s_freq));
         } 
         if (fxEncRes == 1) {
           s_freq = s_freq - 0.1;
           flange.voices(s_idx,s_depth,s_freq);
-          storeVarsToUpdate("s_freq", String(s_freq));
         } 
         //Check flange FX active Toggle
         EncToggleCheck(flangeActive, flange_sw);
@@ -829,12 +775,10 @@ void chorusFX() {
         if (fxEncRes == 2) {
           n_chorus++;
           chorus.voices(n_chorus);
-          storeVarsToUpdate("n_chorus", String(delayTime));
         } 
         if (fxEncRes == 1) {
           n_chorus--;
           chorus.voices(n_chorus);
-          storeVarsToUpdate("n_chorus", String(delayTime));
         }
         
         EncToggleCheck(chorusActive, chorus_sw); //Check Chorus FX active Toggle
@@ -865,12 +809,12 @@ void reverbFX() {
         if (fxEncRes == 2) {
           revRoomsize = revRoomsize + 0.05;
           freeverb.roomsize(revRoomsize);
-          storeVarsToUpdate("revRoomsize", String(revRoomsize));
+          //storeVarsToUpdate("revRoomsize", String(revRoomsize));
         } 
         if (fxEncRes == 1) {
           revRoomsize = revRoomsize - 0.05;
           freeverb.roomsize(revRoomsize);
-          storeVarsToUpdate("revRoomsize", String(revRoomsize));
+          //storeVarsToUpdate("revRoomsize", String(revRoomsize));
         }
         
 
@@ -910,12 +854,12 @@ void delayFX() {
         if (fxEncRes == 2) {
           delayTime = delayTime + 50;
           delay1.delay(0, delayTime);
-          runFileUpdate("delayTime", String(delayTime));
+          //runFileUpdate("delayTime", String(delayTime));
         } 
         if (fxEncRes == 1) {
           delayTime = delayTime - 50;
           delay1.delay(0, delayTime);
-          runFileUpdate("delayTime", String(delayTime));
+          //runFileUpdate("delayTime", String(delayTime));
         }
         
 
@@ -932,6 +876,9 @@ FunctionPointer FXfunctions[] = { flangeFX, chorusFX, reverbFX, delayFX  };
 void checkHomeButton() {
   int buttonState = digitalRead(buttonPin); 
   if (buttonState == LOW) {
+
+    writeUpdatedValues();
+    
     delay(500); 
     landingPage();
   }
@@ -1066,6 +1013,3 @@ void setFXTemplatePage(char title[], bool& FXActive, bool fxCheck) {
     }
   }
 }
-
-
-
