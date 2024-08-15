@@ -5,7 +5,7 @@
       "Application": "Pcbnew",
       "Version": "7.0.9"
     },
-    "CreationDate": "2024-08-05T23:00:28+10:00"
+    "CreationDate": "2024-08-11T11:44:12+10:00"
   },
   "GeneralSpecs": {
     "ProjectId": {
@@ -34,33 +34,8 @@
   ],
   "FilesAttributes": [
     {
-      "Path": "AFPI Device V1.1-F_Cu.gbr",
-      "FileFunction": "Copper,L1,Top",
-      "FilePolarity": "Positive"
-    },
-    {
-      "Path": "AFPI Device V1.1-F_Silkscreen.gbr",
-      "FileFunction": "Legend,Top",
-      "FilePolarity": "Positive"
-    },
-    {
-      "Path": "AFPI Device V1.1-B_Silkscreen.gbr",
-      "FileFunction": "Legend,Bot",
-      "FilePolarity": "Positive"
-    },
-    {
-      "Path": "AFPI Device V1.1-F_Mask.gbr",
-      "FileFunction": "SolderMask,Top",
-      "FilePolarity": "Negative"
-    },
-    {
-      "Path": "AFPI Device V1.1-B_Mask.gbr",
-      "FileFunction": "SolderMask,Bot",
-      "FilePolarity": "Negative"
-    },
-    {
-      "Path": "AFPI Device V1.1-Edge_Cuts.gbr",
-      "FileFunction": "Profile",
+      "Path": "AFPI Device V1.1-F_Paste.gbr",
+      "FileFunction": "SolderPaste,Top",
       "FilePolarity": "Positive"
     }
   ],

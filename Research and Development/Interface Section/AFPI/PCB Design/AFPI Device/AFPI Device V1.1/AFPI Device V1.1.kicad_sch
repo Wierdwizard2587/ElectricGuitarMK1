@@ -4,6 +4,11 @@
 
   (paper "A4")
 
+  (title_block
+    (title "AFPI Device V1.1")
+    (date "2024-08-05")
+  )
+
   (lib_symbols
     (symbol "AFPI_Device:Teensy4.0_AudioShield_REVD" (pin_names (offset 1.016)) (in_bom yes) (on_board yes)
       (property "Reference" "U" (at 0 39.37 0)
