@@ -19,6 +19,8 @@
 #include <seesaw_neopixel.h>
 
 
+
+
 //General FX Variables
 extern int currentEffect;
 extern float param;
@@ -78,5 +80,6 @@ extern float revDamping;
 
 extern bool delayActive;
 extern int delayTime;
+
 
 #endif

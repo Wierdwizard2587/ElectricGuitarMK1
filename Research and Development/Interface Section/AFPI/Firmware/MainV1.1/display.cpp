@@ -74,3 +74,34 @@ void testLoadingScreen() {
     display.println("Loading...");
     display.display();
 }
+
+
+const uint8_t bitmap21[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7f, 0xff, 0xe0, 0xff, 0xff, 0xf0, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x33, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xc0, 0x00, 0x30, 0xff, 0xff, 0xf0, 0x7f, 0xff, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+void setFXTemplatePage(char title[], bool& FXActive, bool fxCheck) {
+  display.clearDisplay();
+  display.setTextColor(WHITE);
+  display.setTextSize(1);
+  display.setFont(NULL);
+  display.setCursor(0, 10);
+  display.setCursor(0, 5);
+  display.setTextWrap(0);
+  display.setCursor(28, 5);
+  display.println(title);
+  display.drawLine(0, 18, 128, 18, 1);
+  display.drawRect(109, 50, 17, 12, 1);
+  display.drawTriangle(114, 58, 120, 55, 114, 52, 1);
+  display.drawRect(2, 50, 17, 12, 1);
+  display.drawTriangle(13, 58, 13, 52, 6, 55, 1);
+  display.fillTriangle(114, 58, 120, 55, 114, 52, 1);
+  display.fillTriangle(13, 58, 13, 52, 6, 55, 1);
+  display.drawBitmap(102, -3, bitmap21, 24, 24, 1);
+  if (fxCheck) {
+    if (FXActive == true){
+      display.fillRoundRect(60, 50, 10, 10, 3, 1);
+    }
+    else {
+      display.drawRoundRect(60, 50, 10, 10, 3, 1);
+    }
+  }
+}

@@ -1,6 +1,6 @@
 #include "config.h"
 
-
+#include "landing_page.h"
 
 
 //General FX Variables

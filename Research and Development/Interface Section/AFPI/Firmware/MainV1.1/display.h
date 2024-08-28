@@ -19,5 +19,6 @@ extern const uint8_t bitmap37[];
 // Function declarations
 void initializeDisplay();
 void testLoadingScreen();
+void setFXTemplatePage(char title[], bool& FXActive, bool fxCheck);
 
 #endif

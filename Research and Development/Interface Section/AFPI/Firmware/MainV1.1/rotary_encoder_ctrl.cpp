@@ -56,3 +56,36 @@ uint32_t Wheel(byte WheelPos) {
   return seesaw_NeoPixel::Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
+int EncDialCheck(int encNo, float paramValue, float maxRange, float minRange) {
+    int32_t enc_pos = ss.getEncoderPosition(encNo);
+    if (enc_positions[0] != enc_pos) {
+        int change = enc_pos - enc_positions[encNo];
+        enc_positions[encNo] = enc_pos;
+
+        if (change > 0 && paramValue < maxRange) {
+            return 2;
+        } else if (change < 0 && paramValue > minRange) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void EncToggleCheck(bool& FXActive, AudioMixer4& mixer_sw) {
+    if (!ss.digitalRead(SS_ENC3_SWITCH)) {
+      if (FXActive == false){
+          FXActive = true;
+          mixer_sw.gain(0, 0);
+          mixer_sw.gain(1, 1);
+      }
+      else {
+          FXActive = false;
+          mixer_sw.gain(0, 1);
+          mixer_sw.gain(1, 0);
+      }         
+    }
+
+    while (!ss.digitalRead(SS_ENC3_SWITCH)) {
+    delay(50);
+    }
+}

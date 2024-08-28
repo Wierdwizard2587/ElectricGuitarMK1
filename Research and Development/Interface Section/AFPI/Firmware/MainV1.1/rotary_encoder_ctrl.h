@@ -23,6 +23,8 @@ extern int32_t enc_positions[4];
 
 // Function declarations
 void initializeEncoders();
+int EncDialCheck(int encNo, float paramValue, float maxRange, float minRange);
+void EncToggleCheck(bool& FXActive, AudioMixer4& mixer_sw);
 
 uint32_t Wheel(byte WheelPos);
 #endif
