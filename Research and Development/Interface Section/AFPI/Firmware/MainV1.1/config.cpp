@@ -63,3 +63,9 @@ float revDamping = 0.0;
 
 bool delayActive;
 int delayTime = 0;
+
+uint8_t oledContrast = 255;
+
+unsigned long previousMillis = 0; // Stores the last time the timer was checked
+const unsigned long interval = 10000; // 10-second interval in milliseconds
+bool lowPwrMode = false;

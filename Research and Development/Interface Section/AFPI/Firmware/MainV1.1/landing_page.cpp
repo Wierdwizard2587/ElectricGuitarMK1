@@ -16,7 +16,10 @@ void landingPage() {
 
   bool choosing = true;
 
+  
+  resetScreenSaver();
   while (choosing == true) {
+    checkScreenTime();
     int EncRes;
     //current option Control Encoder Check
     param = currentHoverOption;
@@ -32,6 +35,7 @@ void landingPage() {
     
     if (!ss.digitalRead(SS_ENC3_SWITCH)) {
       choosing = false;
+      resetScreenSaver();
     }
   }
 

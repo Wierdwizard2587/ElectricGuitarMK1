@@ -1,7 +1,7 @@
 #include "rotary_encoder_ctrl.h"
 
 #include "config.h"
-
+#include "display.h"
 
 // Object definitions
 Adafruit_seesaw ss = Adafruit_seesaw(&Wire1);
@@ -58,13 +58,17 @@ uint32_t Wheel(byte WheelPos) {
 
 int EncDialCheck(int encNo, float paramValue, float maxRange, float minRange) {
     int32_t enc_pos = ss.getEncoderPosition(encNo);
-    if (enc_positions[0] != enc_pos) {
+    if (enc_positions[encNo] != enc_pos) {
         int change = enc_pos - enc_positions[encNo];
         enc_positions[encNo] = enc_pos;
 
-        if (change > 0 && paramValue < maxRange) {
+        
+
+        if (change < 0 && paramValue < maxRange) {
+            resetScreenSaver();
             return 2;
-        } else if (change < 0 && paramValue > minRange) {
+        } else if (change > 0 && paramValue > minRange) {
+            resetScreenSaver();
             return 1;
         }
     }
@@ -73,6 +77,9 @@ int EncDialCheck(int encNo, float paramValue, float maxRange, float minRange) {
 
 void EncToggleCheck(bool& FXActive, AudioMixer4& mixer_sw) {
     if (!ss.digitalRead(SS_ENC3_SWITCH)) {
+
+      resetScreenSaver();
+
       if (FXActive == false){
           FXActive = true;
           mixer_sw.gain(0, 0);

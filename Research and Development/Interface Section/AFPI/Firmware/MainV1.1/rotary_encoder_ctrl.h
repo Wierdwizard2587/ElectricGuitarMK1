@@ -3,6 +3,8 @@
 
 #include "config.h"
 
+#include "Adafruit_seesaw.h"
+#include <seesaw_neopixel.h>
 
 // Pin definitions
 #define SS_NEO_PIN       18

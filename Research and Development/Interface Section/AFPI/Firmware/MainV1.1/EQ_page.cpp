@@ -15,6 +15,10 @@ void EQPage() {
     setFXTemplatePage(title, notFX, false);
 
     display.display();
+
+    checkScreenTime();
+
+    
     checkHomeButton();
   }
 }

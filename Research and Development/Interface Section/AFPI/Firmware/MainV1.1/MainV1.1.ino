@@ -6,7 +6,6 @@
 #include "rotary_encoder_ctrl.h"
 #include "home_button.h"
 
-
 #include "landing_page.h"
 #include "settings_page.h"
 #include "RGB_page.h"

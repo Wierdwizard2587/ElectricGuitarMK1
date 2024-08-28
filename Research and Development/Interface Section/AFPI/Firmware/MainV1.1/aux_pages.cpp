@@ -30,6 +30,8 @@ void masterAuxPage() {
     display.println(currentAudioOutput);
     display.display();
 
+    checkScreenTime();
+    
     checkHomeButton();
 
     //Master volume Control Encoder Check
@@ -110,6 +112,7 @@ void backTrackAuxPage() {
     display.println(backingMix);
     display.display();
 
+    checkScreenTime();
     checkHomeButton();
 
     //Master volume Control Encoder Check

@@ -1,7 +1,8 @@
 #include "display.h"
 
 #include "config.h"
-
+#include "rotary_encoder_ctrl.h"
+#include "home_button.h"
 // Initialize the display object
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, OLED_RESET);
 
@@ -59,8 +60,17 @@ void initializeDisplay() {
     }
 
     display.display();
+    setOLEDContrast(oledContrast);
     testLoadingScreen();
 }
+
+
+void setOLEDContrast(uint8_t contrast) {
+  display.ssd1306_command(SSD1306_SETCONTRAST);
+  display.ssd1306_command(contrast);
+}
+
+
 
 void testLoadingScreen() {
     display.clearDisplay();
@@ -104,4 +114,89 @@ void setFXTemplatePage(char title[], bool& FXActive, bool fxCheck) {
       display.drawRoundRect(60, 50, 10, 10, 3, 1);
     }
   }
+}
+
+void checkScreenTime() {
+    unsigned long currentMillis = millis(); // Get the current time
+
+    // Check if 10 seconds have passed since the last reset and button has not been pressed
+    if (currentMillis - previousMillis >= interval) {
+      previousMillis = currentMillis; // Reset the timer
+      screenSaverActive();
+    }
+}
+
+void screenSaverActive() {
+    display.clearDisplay();
+    display.display();
+    while (true) {
+      if (checkActivity()) {
+        break;
+      }
+      delay(50);
+    }
+    resetScreenSaver();
+
+}
+
+void resetScreenSaver() {
+    previousMillis = millis();
+}
+
+bool checkActivity() {
+  if (!ss.digitalRead(SS_ENC3_SWITCH)) {
+      while (!ss.digitalRead(SS_ENC3_SWITCH)) {
+        delay(50);
+      }
+    return true;
+  }
+
+  if (!ss.digitalRead(SS_ENC2_SWITCH)) {
+      while (!ss.digitalRead(SS_ENC2_SWITCH)) {
+        delay(50);
+      }
+      return true;
+  }
+
+  if (!ss.digitalRead(SS_ENC1_SWITCH)) {
+      while (!ss.digitalRead(SS_ENC1_SWITCH)) {
+        delay(50);
+      }
+      return true;
+  }
+
+  if (!ss.digitalRead(SS_ENC0_SWITCH)) {
+      while (!ss.digitalRead(SS_ENC0_SWITCH)) {
+        delay(50);
+      }
+      return true;
+  }
+
+  if (homeButtonActivity()) {
+      return true;
+  }
+
+  int32_t enc_pos0 = ss.getEncoderPosition(0);
+  if (enc_positions[0] != enc_pos0) {
+    enc_positions[0] = enc_pos0;
+    return true;
+  }
+  int32_t enc_pos1 = ss.getEncoderPosition(1);
+  if (enc_positions[1] != enc_pos1) {
+    enc_positions[1] = enc_pos1;
+    return true;
+  }
+  int32_t enc_pos2 = ss.getEncoderPosition(2);
+  if (enc_positions[2] != enc_pos2) {
+    enc_positions[2] = enc_pos2;
+    return true;
+  }
+  int32_t enc_pos3 = ss.getEncoderPosition(3);
+  if (enc_positions[3] != enc_pos3) {
+    enc_positions[3] = enc_pos3;
+    return true;
+  } else {
+    return false;
+  }
+
 }

@@ -16,6 +16,9 @@ void RGBPage() {
     setFXTemplatePage(title, notFX, false);
 
     display.display();
+
+    checkScreenTime();
+    
     checkHomeButton();
   }
 }

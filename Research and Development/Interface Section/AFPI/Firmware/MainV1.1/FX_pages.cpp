@@ -17,6 +17,8 @@ void flangeFX() {
         display.println(s_freq);
         display.display();
 
+        checkScreenTime();
+
         checkHomeButton();
         //flange Freq Control Encoder Check
         param = s_freq;
@@ -48,6 +50,9 @@ void chorusFX() {
         display.println(n_chorus);
 
         display.display();
+
+        checkScreenTime();
+
         checkHomeButton();
         //chorus Voice amount Control Encoder Check
         param = n_chorus;
@@ -81,6 +86,9 @@ void reverbFX() {
         display.println(revDamping);
 
         display.display();
+
+        checkScreenTime();
+
         checkHomeButton();
 
         //Reverb Room Size Control Encoder Check
@@ -126,6 +134,8 @@ void delayFX() {
         display.setCursor(24, 35);
         display.println(delayTime);
         display.display();
+        
+        checkScreenTime();
         
         checkHomeButton();
         //Delay time Control Encoder Check

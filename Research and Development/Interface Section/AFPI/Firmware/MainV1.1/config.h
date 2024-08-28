@@ -10,15 +10,6 @@
 
 #include <SD.h>
 #include <SerialFlash.h>
-#include <regex>
-
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-
-#include "Adafruit_seesaw.h"
-#include <seesaw_neopixel.h>
-
-
 
 
 //General FX Variables
@@ -82,4 +73,9 @@ extern bool delayActive;
 extern int delayTime;
 
 
+extern uint8_t oledContrast;
+
+extern unsigned long previousMillis; 
+extern const unsigned long interval;
+extern bool lowPwrMode;
 #endif

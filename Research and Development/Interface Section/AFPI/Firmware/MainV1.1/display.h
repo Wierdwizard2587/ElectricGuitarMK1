@@ -2,6 +2,8 @@
 #define DISPLAY_H
 
 #include "config.h"
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 // Display settings
 #define SCREEN_WIDTH 128
@@ -20,5 +22,11 @@ extern const uint8_t bitmap37[];
 void initializeDisplay();
 void testLoadingScreen();
 void setFXTemplatePage(char title[], bool& FXActive, bool fxCheck);
+void setOLEDContrast(uint8_t contrast);
+void checkScreenTime();
+void screenSaverActive();
+void resetScreenSaver();
+bool checkActivity();
+
 
 #endif

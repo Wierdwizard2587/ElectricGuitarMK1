@@ -7,5 +7,5 @@
 extern const int buttonPin;
 
 void checkHomeButton();
-
+bool homeButtonActivity();
 #endif

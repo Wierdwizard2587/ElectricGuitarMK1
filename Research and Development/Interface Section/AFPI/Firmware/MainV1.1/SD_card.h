@@ -2,6 +2,7 @@
 #define SD_CARD_H
 
 #include "config.h"
+#include <regex>
 
 struct Variable {
     String name;
