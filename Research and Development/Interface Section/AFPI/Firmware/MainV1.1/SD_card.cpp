@@ -1,5 +1,5 @@
 #include "SD_card.h"
-
+#include "audio_processing.h"
 const int chipSelect = 10;
 
 //#include "config.h"
@@ -171,5 +171,5 @@ void writeUpdatedValues() {
     file.print(fileContent);
     file.close();
 
-    
+    audioShield.volume(masterVolume);
 }

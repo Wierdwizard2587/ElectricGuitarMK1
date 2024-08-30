@@ -47,10 +47,17 @@ extern int auxOutOpt;
 extern int currentEQPage;
 extern float screenBrightness;
 
+
 // audio shield volume
 extern float masterVolume;
 extern int gainOut;
 
+extern int SPgainOut;
+extern int AUXgainOut;
+extern bool distortActive;
+#define MAX_ORDER 2
+extern float alpha[MAX_ORDER - 1]; // First entry is second-order
+extern float waveshape[32769];
 
 #define FLANGE_DELAY_LENGTH (6*AUDIO_BLOCK_SAMPLES)
 extern short flange_delayline[];

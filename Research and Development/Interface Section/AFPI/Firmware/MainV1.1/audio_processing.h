@@ -5,6 +5,8 @@
 
 // Declare audio objects
 extern AudioInputI2S            i2s1_in;
+extern AudioEffectWaveshaper    waveshape1; 
+extern AudioMixer4              distort_sw;
 extern AudioEffectFlange        flange;
 extern AudioMixer4              flange_sw;
 extern AudioEffectChorus        chorus;
@@ -34,11 +36,20 @@ extern AudioConnection          patchCord13;
 extern AudioConnection          patchCord14;
 extern AudioConnection          patchCord15;
 extern AudioConnection          patchCord16;
+extern AudioConnection          patchCord17;
+extern AudioConnection          patchCord18;
+extern AudioConnection          patchCord19;
 
 // Other global variables
 extern const int inputChSelect;
 extern const int chipSelect;
 
+
+
+
 void initialiseAudio();
+void initialiseDistortion();
+
+
 
 #endif

@@ -15,4 +15,8 @@ extern FunctionPointer auxFunctions[];
 void audioPage();
 void cycleAux(int encNo, int param, int maxRange, int minRange);
 
+extern float vol;
+extern int gain;
+void determineOutputGain(int selGain);
+void determineOutputVol(float selVol);
 #endif

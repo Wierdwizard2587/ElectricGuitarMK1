@@ -18,6 +18,8 @@ void setup() {
   //while (!Serial) delay(10);
   initializeDisplay();
   initialiseSDCard();
+  initialiseAudio();
+  initialiseDistortion();
   pinMode(buttonPin, INPUT_PULLUP);
   Wire1.begin();
   initializeEncoders();

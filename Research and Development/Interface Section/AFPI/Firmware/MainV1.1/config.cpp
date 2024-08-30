@@ -19,8 +19,8 @@ int currentHoverOption = 0;
 float lineMix;
 float backingMix;
 float HPVol;
-float SPVol;
-float AUXVol;
+float SPVol = 0.7;
+float AUXVol = 0.7;
 bool EQActive = false;
 float bassBand;
 float midBassBand;
@@ -42,7 +42,13 @@ float screenBrightness;
 // audio shield volume
 float masterVolume  = 0.0;
 int gainOut = 13;
+int SPgainOut = 13;
+int AUXgainOut = 13;
 
+//Distortion FX
+bool distortActive = false;
+float alpha[MAX_ORDER-1] = {0.05}; // First entry is second-order
+float waveshape[32769] = {0};
 
 //#define FLANGE_DELAY_LENGTH (6*AUDIO_BLOCK_SAMPLES)
 short flange_delayline[FLANGE_DELAY_LENGTH];

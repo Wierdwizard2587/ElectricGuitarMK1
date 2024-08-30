@@ -7,23 +7,41 @@
 #include "display.h"
 #include "home_button.h"
 
+float vol;
+int gain;
+
 void masterAuxPage() {
   while (!ss.digitalRead(SS_ENC3_SWITCH)) {
     delay(50);
   }
   currentAuxPage = 0;
+
   while (true) {
+
+    if (currentAudioOutput == 0){
+      vol = SPVol;
+      gain = SPgainOut;
+    }
+    if (currentAudioOutput == 1){
+      vol = masterVolume;
+      gain = gainOut;
+    }
+    if (currentAudioOutput == 2){
+      vol = AUXVol;
+      gain = AUXgainOut;
+    }
+
     char title[] = {"Aux #1 Master Vol"};
     bool notFX = false;
     setFXTemplatePage(title, notFX, false);
     display.setCursor(1, 20);
     display.print("MasVol:");
     display.setCursor(10, 35);
-    display.println(masterVolume);
+    display.println(vol);
     display.setCursor(55, 20);
     display.print("Gain:");
     display.setCursor(60, 35);
-    display.println(gainOut);
+    display.println(gain);
     display.setCursor(80, 20);
     display.print("Out:");
     display.setCursor(90, 35);
@@ -36,26 +54,29 @@ void masterAuxPage() {
 
     //Master volume Control Encoder Check
     int EncRes;
+    
     param = masterVolume;
     EncRes = EncDialCheck(0, param, 1.0, 0.0);
     if (EncRes == 2) {
-      masterVolume = masterVolume + 0.05;
-      audioShield.volume(masterVolume);
+      vol = vol + 0.05;
+      determineOutputVol(vol);
     } 
     if (EncRes == 1) {
-      masterVolume = masterVolume - 0.05;
-      audioShield.volume(masterVolume);
+      vol = vol - 0.05;
+      determineOutputVol(vol);
+      //audioShield.volume(masterVolume);
     }
     //Master Gain out Control Encoder Check
     param = gainOut;
     EncRes = EncDialCheck(1, param, 31, 13);
     if (EncRes == 2) {
-      gainOut = gainOut + 1;
-      audioShield.lineOutLevel(gainOut);
+      gain = gain + 1;
+      determineOutputGain(gain);
     } 
     if (EncRes == 1) {
-      gainOut = gainOut - 1;
-      audioShield.lineOutLevel(gainOut);
+      gain = gain - 1;
+      determineOutputGain(gain);
+      //audioShield.lineOutLevel(gainOut);
     }
     //audioShield.dacVolume(0.0, 0.0);
     //audio output selection, 0 = speaker, 1 = headphones, 2 = aux out
@@ -63,8 +84,8 @@ void masterAuxPage() {
       if (currentAudioOutput == 2){ //switch to speaker, next change will be hp
           currentAudioOutput = 0;
 
-          audioShield.lineOutLevel(13, 31);
-          audioShield.dacVolume(1.0, 0.05);
+          audioShield.lineOutLevel(SPgainOut, 31);
+          audioShield.dacVolume(SPVol, 0.05);
 
       } else if (currentAudioOutput == 0){ // switch to hp, next change will be aux out
           currentAudioOutput = 1;
@@ -78,7 +99,8 @@ void masterAuxPage() {
           audioShield.muteHeadphone();
           audioShield.unmuteLineout();
           //audioShield.lineOutLevel(31, 13);
-          audioShield.dacVolume(0.05, 1.0);
+          audioShield.dacVolume(0.05, AUXVol);
+          audioShield.lineOutLevel(31, AUXgainOut);
       }
     }
 
@@ -91,6 +113,39 @@ void masterAuxPage() {
     
   }
 }
+
+
+void determineOutputVol(float selVol) {
+  if (currentAudioOutput == 0){
+    audioShield.dacVolume(selVol, 0.05);
+    SPVol = selVol;
+  }
+  if (currentAudioOutput == 1){
+    audioShield.volume(selVol);
+    masterVolume = selVol;
+  }
+  if (currentAudioOutput == 2){
+    audioShield.dacVolume(0.05, selVol);
+    AUXVol = selVol;
+  }
+}
+
+void determineOutputGain(int selGain) {
+  if (currentAudioOutput == 0){
+    audioShield.lineOutLevel(selGain, 31);
+    SPgainOut = selGain;
+
+  }
+  if (currentAudioOutput == 1){
+    audioShield.lineOutLevel(selGain);
+    gainOut = selGain;
+  }
+  if (currentAudioOutput == 2){
+    audioShield.lineOutLevel(31, selGain);
+    AUXgainOut = selGain;
+  }
+}
+
 
 
 void backTrackAuxPage() {

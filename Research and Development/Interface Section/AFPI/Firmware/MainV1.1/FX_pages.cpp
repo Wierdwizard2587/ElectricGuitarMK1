@@ -6,10 +6,63 @@
 #include "display.h"
 #include "home_button.h"
 
-void flangeFX() {
+void distortFX() {
     currentEffect = 0;
     while (true) {
-        char title[] = {"FX #1 Flange"};
+        char title[] = {"FX #1 Distort"};
+        setFXTemplatePage(title, distortActive, true);
+        display.setCursor(1, 20);
+        display.print("val:");
+        display.setCursor(15, 35);
+        display.println("val");
+        display.setCursor(55, 20);
+        display.print("val:");
+        display.setCursor(65, 35);
+        display.println("val");
+
+        display.display();
+
+        checkScreenTime();
+
+        checkHomeButton();
+
+        //Reverb Room Size Control Encoder Check
+        // param = revRoomsize;
+        // fxEncRes = EncDialCheck(0, param, 1.0, 0.0);
+        // if (fxEncRes == 2) {
+        //   revRoomsize = revRoomsize + 0.05;
+        //   freeverb.roomsize(revRoomsize);
+        //   //storeVarsToUpdate("revRoomsize", String(revRoomsize));
+        // } 
+        // if (fxEncRes == 1) {
+        //   revRoomsize = revRoomsize - 0.05;
+        //   freeverb.roomsize(revRoomsize);
+        //   //storeVarsToUpdate("revRoomsize", String(revRoomsize));
+        // }
+        
+
+        //Reverb Damping Control Encoder Check
+        // param = revDamping;
+        // fxEncRes = EncDialCheck(1, param, 1.0, 0.0);
+        // if (fxEncRes == 2) {
+        //   revDamping = revDamping + 0.05;
+        //   freeverb.damping(revDamping);
+        // } 
+        // if (fxEncRes == 1) {
+        //   revDamping = revDamping - 0.05;
+        //   freeverb.damping(revDamping);
+        // }
+        
+        EncToggleCheck(distortActive, distort_sw);//Check distortion FX active Toggle
+        cycleFX(3, currentEffect, 4.0, 0.0);//Check FX selected change 
+    }
+}
+
+
+void flangeFX() {
+    currentEffect = 1;
+    while (true) {
+        char title[] = {"FX #2 Flange"};
         setFXTemplatePage(title, flangeActive, true);
         display.setCursor(10, 20);
         display.print("Freq:");
@@ -34,14 +87,14 @@ void flangeFX() {
         //Check flange FX active Toggle
         EncToggleCheck(flangeActive, flange_sw);
         //Check FX selected change 
-        cycleFX(3, currentEffect, 3.0, 0.0);
+        cycleFX(3, currentEffect, 4.0, 0.0);
     }
 }
 
 void chorusFX() {
-    currentEffect = 1;
+    currentEffect = 2;
     while (true) {
-        char title[] = {"FX #2 Chorus"};
+        char title[] = {"FX #3 Chorus"};
         setFXTemplatePage(title, chorusActive, true);
         
         display.setCursor(10, 20);
@@ -67,14 +120,14 @@ void chorusFX() {
         }
         
         EncToggleCheck(chorusActive, chorus_sw); //Check Chorus FX active Toggle
-        cycleFX(3, currentEffect, 3.0, 0.0); //Check FX selected change 
+        cycleFX(3, currentEffect, 4.0, 0.0); //Check FX selected change 
     }
 }
 
 void reverbFX() {
-    currentEffect = 2;
+    currentEffect = 3;
     while (true) {
-        char title[] = {"FX #3 Reverb"};
+        char title[] = {"FX #4 Reverb"};
         setFXTemplatePage(title, reverbActive, true);
         display.setCursor(1, 20);
         display.print("RoomSize:");
@@ -119,15 +172,15 @@ void reverbFX() {
         }
         
         EncToggleCheck(reverbActive, reverb_sw);//Check reverb FX active Toggle
-        cycleFX(3, currentEffect, 3.0, 0.0);//Check FX selected change 
+        cycleFX(3, currentEffect, 4.0, 0.0);//Check FX selected change 
     }
 }
 
 
 void delayFX() {
-    currentEffect = 3;
+    currentEffect = 4;
     while (true) {
-        char title[] = {"FX #4 Delay"};
+        char title[] = {"FX #5 Delay"};
         setFXTemplatePage(title, delayActive, true);
         display.setCursor(10, 20);
         display.print("Time Ms:");
@@ -156,12 +209,12 @@ void delayFX() {
         EncToggleCheck(delayActive, delay_sw); //Check delay FX active Toggle
         delay_sw.gain(0, 1);
          
-        cycleFX(3, currentEffect, 3.0, 0.0);//Check FX selected change
+        cycleFX(3, currentEffect, 4.0, 0.0);//Check FX selected change
     }
 }
 
 typedef void (*FunctionPointer)();
-FunctionPointer FXfunctions[] = { flangeFX, chorusFX, reverbFX, delayFX  };
+FunctionPointer FXfunctions[] = { distortFX, flangeFX, chorusFX, reverbFX, delayFX  };
 
 
 
