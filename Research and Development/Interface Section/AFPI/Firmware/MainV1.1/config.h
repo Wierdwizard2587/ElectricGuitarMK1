@@ -27,6 +27,7 @@ extern int currentHoverOption;
 
 extern float lineMix;
 extern float backingMix;
+extern bool backingActive;
 extern float HPVol;
 extern float SPVol;
 extern float AUXVol;
@@ -45,15 +46,14 @@ extern bool rgbActive;
 extern float rgbBrightness;
 extern int auxOutOpt;
 extern int currentEQPage;
-extern float screenBrightness;
+
 
 
 // audio shield volume
-extern float masterVolume;
-extern int gainOut;
+extern int HPGainOut;
 
-extern int SPgainOut;
-extern int AUXgainOut;
+extern int SPGainOut;
+extern int AuxGainOut;
 extern bool distortActive;
 #define MAX_ORDER 2
 extern float alpha[MAX_ORDER - 1]; // First entry is second-order

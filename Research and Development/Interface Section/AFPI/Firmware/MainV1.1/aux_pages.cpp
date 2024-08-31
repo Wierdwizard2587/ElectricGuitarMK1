@@ -20,15 +20,16 @@ void masterAuxPage() {
 
     if (currentAudioOutput == 0){
       vol = SPVol;
-      gain = SPgainOut;
+      gain = SPGainOut;
+
     }
     if (currentAudioOutput == 1){
-      vol = masterVolume;
-      gain = gainOut;
+      vol = HPVol;
+      gain = HPGainOut;
     }
     if (currentAudioOutput == 2){
       vol = AUXVol;
-      gain = AUXgainOut;
+      gain = AuxGainOut;
     }
 
     char title[] = {"Aux #1 Master Vol"};
@@ -54,9 +55,7 @@ void masterAuxPage() {
 
     //Master volume Control Encoder Check
     int EncRes;
-    
-    param = masterVolume;
-    EncRes = EncDialCheck(0, param, 1.0, 0.0);
+    EncRes = EncDialCheck(0, vol, 1.0, 0.0);
     if (EncRes == 2) {
       vol = vol + 0.05;
       determineOutputVol(vol);
@@ -67,8 +66,7 @@ void masterAuxPage() {
       //audioShield.volume(masterVolume);
     }
     //Master Gain out Control Encoder Check
-    param = gainOut;
-    EncRes = EncDialCheck(1, param, 31, 13);
+    EncRes = EncDialCheck(1, gain, 31, 13);
     if (EncRes == 2) {
       gain = gain + 1;
       determineOutputGain(gain);
@@ -84,7 +82,7 @@ void masterAuxPage() {
       if (currentAudioOutput == 2){ //switch to speaker, next change will be hp
           currentAudioOutput = 0;
 
-          audioShield.lineOutLevel(SPgainOut, 31);
+          audioShield.lineOutLevel(SPGainOut, 31);
           audioShield.dacVolume(SPVol, 0.05);
 
       } else if (currentAudioOutput == 0){ // switch to hp, next change will be aux out
@@ -93,6 +91,9 @@ void masterAuxPage() {
           audioShield.muteLineout();
 
           audioShield.dacVolume(1.0, 1.0);
+          
+          audioShield.volume(HPVol);
+          audioShield.lineOutLevel(HPGainOut);
 
       } else if (currentAudioOutput == 1){ // switch to aux out, next change will be speaker
           currentAudioOutput = 2;
@@ -100,7 +101,7 @@ void masterAuxPage() {
           audioShield.unmuteLineout();
           //audioShield.lineOutLevel(31, 13);
           audioShield.dacVolume(0.05, AUXVol);
-          audioShield.lineOutLevel(31, AUXgainOut);
+          audioShield.lineOutLevel(31, AuxGainOut);
       }
     }
 
@@ -122,7 +123,7 @@ void determineOutputVol(float selVol) {
   }
   if (currentAudioOutput == 1){
     audioShield.volume(selVol);
-    masterVolume = selVol;
+    HPVol = selVol;
   }
   if (currentAudioOutput == 2){
     audioShield.dacVolume(0.05, selVol);
@@ -133,16 +134,16 @@ void determineOutputVol(float selVol) {
 void determineOutputGain(int selGain) {
   if (currentAudioOutput == 0){
     audioShield.lineOutLevel(selGain, 31);
-    SPgainOut = selGain;
+    SPGainOut = selGain;
 
   }
   if (currentAudioOutput == 1){
     audioShield.lineOutLevel(selGain);
-    gainOut = selGain;
+    HPGainOut = selGain;
   }
   if (currentAudioOutput == 2){
     audioShield.lineOutLevel(31, selGain);
-    AUXgainOut = selGain;
+    AuxGainOut = selGain;
   }
 }
 

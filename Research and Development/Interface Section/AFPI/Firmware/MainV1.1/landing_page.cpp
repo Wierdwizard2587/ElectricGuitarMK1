@@ -72,7 +72,7 @@ void setLandingPage() {
     display.setFont(NULL);
     display.setTextWrap(0);
     display.setCursor(28, 10);
-    display.println("Expiditioner");
+    display.println("Expeditioner");
     display.setCursor(0, 10);
     display.drawLine(0, 20, 128, 20, 1);
     display.drawRect(0, 20, 25, 44, 1);

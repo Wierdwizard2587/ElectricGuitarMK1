@@ -18,11 +18,18 @@ void initialiseSDCard() {
 // Define your variables
 Variable variables[] = {
     {"currentAuxPage", &currentAuxPage, updateInt},
-    {"auxOutOpt", &auxOutOpt, updateInt},
+    {"currentAudioOutput", &currentAudioOutput, updateInt},
     {"HPVol", &HPVol, updateFloat},
     {"SPVol", &SPVol, updateFloat},
     {"AUXVol", &AUXVol, updateFloat},
-    {"gainOut", &gainOut, updateInt},
+    {"HPGainOut", &HPGainOut, updateInt},
+    {"SPGainOut", &SPGainOut, updateInt},
+    {"AuxGainOut", &AuxGainOut, updateInt},
+    {"lineMix", &lineMix, updateFloat},
+    {"backingMix", &backingMix, updateFloat},
+    {"backingActive", &backingActive, updateBool},
+
+    {"distortActive", &distortActive, updateBool},
     {"currentEffect", &currentEffect, updateInt},
     {"flangeActive", &flangeActive, updateBool},
     {"s_freq", &s_freq, updateFloat},
@@ -33,6 +40,7 @@ Variable variables[] = {
     {"revDamping", &revDamping, updateFloat},
     {"delayActive", &delayActive, updateBool},
     {"delayTime", &delayTime, updateInt},
+
     {"currentEQPage", &currentEQPage, updateInt},
     {"EQActive", &EQActive, updateBool},
     {"bassBand", &bassBand, updateFloat},
@@ -45,9 +53,10 @@ Variable variables[] = {
     {"bass_lev", &bass_lev, updateFloat},
     {"hpf_bypass", &hpf_bypass, updateInt},
     {"cutoff", &cutoff, updateInt},
+
     {"rgbActive", &rgbActive, updateBool},
     {"rgbBrightness", &rgbBrightness, updateFloat},
-    {"screenBrightness", &screenBrightness, updateFloat}
+    {"oledContrast", &oledContrast, updateInt}
     
 };
 
@@ -171,5 +180,4 @@ void writeUpdatedValues() {
     file.print(fileContent);
     file.close();
 
-    audioShield.volume(masterVolume);
 }

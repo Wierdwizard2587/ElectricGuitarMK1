@@ -18,6 +18,7 @@ int currentHoverOption = 0;
 
 float lineMix;
 float backingMix;
+bool backingActive = false;
 float HPVol;
 float SPVol = 0.7;
 float AUXVol = 0.7;
@@ -36,14 +37,13 @@ bool rgbActive = false;
 float rgbBrightness;
 int auxOutOpt;
 int currentEQPage;
-float screenBrightness;
+
 
 
 // audio shield volume
-float masterVolume  = 0.0;
-int gainOut = 13;
-int SPgainOut = 13;
-int AUXgainOut = 13;
+int HPGainOut = 13;
+int SPGainOut = 13;
+int AuxGainOut = 13;
 
 //Distortion FX
 bool distortActive = false;

@@ -49,7 +49,7 @@ extern const int chipSelect;
 
 void initialiseAudio();
 void initialiseDistortion();
-
+void determineAudioOutput();
 
 
 #endif

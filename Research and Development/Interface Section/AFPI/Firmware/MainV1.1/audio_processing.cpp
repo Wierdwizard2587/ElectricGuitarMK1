@@ -65,8 +65,8 @@ void initialiseAudio() {
 
     audioShield.enable();
     audioShield.inputSelect(inputChSelect); 
-    audioShield.volume(masterVolume);
-    audioShield.lineOutLevel(gainOut);
+
+    determineAudioOutput();
 
     distort_sw.gain(0, 1);
     distort_sw.gain(1, 0);
@@ -104,6 +104,28 @@ void initialiseAudio() {
     flange.begin(flange_delayline, FLANGE_DELAY_LENGTH, s_idx, s_depth, s_freq);
 }
 
+void determineAudioOutput() {
+    if (currentAudioOutput == 0){
+    audioShield.muteHeadphone();
+    audioShield.unmuteLineout();
+    audioShield.dacVolume(SPVol, 0.05);
+    audioShield.lineOutLevel(SPGainOut, 31);
+  }
+  if (currentAudioOutput == 1){
+    audioShield.unmuteHeadphone();
+    audioShield.muteLineout();
+    audioShield.dacVolume(1.0, 1.0);
+
+    audioShield.volume(HPVol);
+    audioShield.lineOutLevel(HPGainOut);
+  }
+  if (currentAudioOutput == 2){
+    audioShield.muteHeadphone();
+    audioShield.unmuteLineout();
+    audioShield.dacVolume(0.05, AUXVol);
+    audioShield.lineOutLevel(31, AuxGainOut);
+  }
+}
 void initialiseDistortion() {
     float *x = (float*)malloc(sizeof(float)*32769),
         *cheby_poly_lut_0 = (float*)malloc(sizeof(float)*32769),
