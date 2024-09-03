@@ -5,6 +5,7 @@
 #include "display.h"
 #include "rotary_encoder_ctrl.h"
 #include "home_button.h"
+#include "RGB_processing.h"
 
 #include "landing_page.h"
 #include "settings_page.h"
@@ -19,10 +20,11 @@ void setup() {
   initializeDisplay();
   initialiseSDCard();
   initialiseAudio();
-  initialiseDistortion();
+  //initialiseDistortion();
   pinMode(buttonPin, INPUT_PULLUP);
   Wire1.begin();
   initializeEncoders();
+  initialiseRGB();
 }
 
 void loop() {

@@ -5,6 +5,7 @@
 #include "rotary_encoder_ctrl.h"
 #include "display.h"
 #include "home_button.h"
+#include "RGB_processing.h"
 
 void distortFX() {
     currentEffect = 0;
@@ -21,6 +22,8 @@ void distortFX() {
         display.println("val");
 
         display.display();
+
+        checkRGBinterval();
 
         checkScreenTime();
 
@@ -70,6 +73,8 @@ void flangeFX() {
         display.println(s_freq);
         display.display();
 
+        checkRGBinterval();
+
         checkScreenTime();
 
         checkHomeButton();
@@ -103,6 +108,8 @@ void chorusFX() {
         display.println(n_chorus);
 
         display.display();
+
+        checkRGBinterval();
 
         checkScreenTime();
 
@@ -139,6 +146,8 @@ void reverbFX() {
         display.println(revDamping);
 
         display.display();
+
+        checkRGBinterval();
 
         checkScreenTime();
 
@@ -188,6 +197,8 @@ void delayFX() {
         display.println(delayTime);
         display.display();
         
+        checkRGBinterval();
+
         checkScreenTime();
         
         checkHomeButton();

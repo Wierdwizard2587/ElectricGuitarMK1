@@ -63,6 +63,8 @@ delayTime=200
 //rgb values
 rgbActive=false
 rgbBrightness=0.0
+rgbColour=0
+rgbEffect=0
 
 //settings values
 oledContrast=255

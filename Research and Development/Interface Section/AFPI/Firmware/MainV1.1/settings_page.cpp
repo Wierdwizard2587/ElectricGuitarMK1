@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "display.h"
+#include "RGB_processing.h"
 void settingsPage() {
   while (!ss.digitalRead(SS_ENC3_SWITCH)) {
     delay(50);
@@ -20,6 +21,9 @@ void settingsPage() {
     display.setCursor(60, 35);
     display.println("val");
     display.display();
+
+
+    
 
     checkScreenTime();
     

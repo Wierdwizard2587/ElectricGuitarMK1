@@ -34,7 +34,9 @@ float bass_lev;
 int hpf_bypass;
 int cutoff;
 bool rgbActive = false;
-float rgbBrightness;
+int rgbBrightness = 50;
+int rgbColour = 1;
+int rgbEffect = 1;
 int auxOutOpt;
 int currentEQPage;
 

@@ -43,7 +43,9 @@ extern float bass_lev;
 extern int hpf_bypass;
 extern int cutoff;
 extern bool rgbActive;
-extern float rgbBrightness;
+extern int rgbBrightness;
+extern int rgbColour;
+extern int rgbEffect;
 extern int auxOutOpt;
 extern int currentEQPage;
 

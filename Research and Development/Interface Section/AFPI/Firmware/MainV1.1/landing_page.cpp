@@ -10,6 +10,7 @@
 #include "aux_pages.h"
 #include "FX_pages.h"
 #include "EQ_page.h"
+#include "RGB_processing.h"
 
 void landingPage() { 
   hoverOptionSelector();
@@ -19,6 +20,8 @@ void landingPage() {
   
   resetScreenSaver();
   while (choosing == true) {
+    checkRGBinterval();
+
     checkScreenTime();
     int EncRes;
     //current option Control Encoder Check

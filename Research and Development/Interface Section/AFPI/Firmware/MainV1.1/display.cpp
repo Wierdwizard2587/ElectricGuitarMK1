@@ -3,6 +3,7 @@
 #include "config.h"
 #include "rotary_encoder_ctrl.h"
 #include "home_button.h"
+#include "RGB_processing.h"
 // Initialize the display object
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, OLED_RESET);
 
@@ -130,6 +131,7 @@ void screenSaverActive() {
     display.clearDisplay();
     display.display();
     while (true) {
+      checkRGBinterval();
       if (checkActivity()) {
         break;
       }

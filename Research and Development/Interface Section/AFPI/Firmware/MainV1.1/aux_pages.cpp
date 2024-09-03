@@ -6,6 +6,7 @@
 #include "rotary_encoder_ctrl.h"
 #include "display.h"
 #include "home_button.h"
+#include "RGB_processing.h"
 
 float vol;
 int gain;
@@ -48,6 +49,9 @@ void masterAuxPage() {
     display.setCursor(90, 35);
     display.println(currentAudioOutput);
     display.display();
+
+
+    checkRGBinterval();
 
     checkScreenTime();
     
@@ -168,6 +172,7 @@ void backTrackAuxPage() {
     display.println(backingMix);
     display.display();
 
+    checkRGBinterval();
     checkScreenTime();
     checkHomeButton();
 
