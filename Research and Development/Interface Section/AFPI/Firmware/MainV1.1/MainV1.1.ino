@@ -6,6 +6,7 @@
 #include "rotary_encoder_ctrl.h"
 #include "home_button.h"
 #include "RGB_processing.h"
+#include "low_pwr_mode.h"
 
 #include "landing_page.h"
 #include "settings_page.h"
@@ -25,6 +26,7 @@ void setup() {
   Wire1.begin();
   initializeEncoders();
   initialiseRGB();
+  lowPwrModeHandle();
 }
 
 void loop() {

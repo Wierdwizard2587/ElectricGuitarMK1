@@ -18,6 +18,8 @@ extern Adafruit_SSD1306 display;
 extern const unsigned char PROGMEM logo_bmp[];
 extern const uint8_t bitmap37[];
 
+extern unsigned long screenSaverInterval;
+
 // Function declarations
 void initializeDisplay();
 void testLoadingScreen();
@@ -27,6 +29,6 @@ void checkScreenTime();
 void screenSaverActive();
 void resetScreenSaver();
 bool checkActivity();
-
+void setSaverInterval();
 
 #endif

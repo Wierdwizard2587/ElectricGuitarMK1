@@ -2,7 +2,6 @@
 
 
 #include "config.h"
-#include <FastLED.h>
 #include "RGB_processing.h"
 #include "rotary_encoder_ctrl.h"
 #include "display.h"
@@ -53,14 +52,14 @@ void RGBPage() {
     EncRes = EncDialCheck(0, rgbBrightness, 255, 5);
     if (EncRes == 2) {
       rgbBrightness = rgbBrightness + 5;
-      FastLED.setBrightness(rgbBrightness);
+      setLEDBrightness();
     } 
     if (EncRes == 1) {
       rgbBrightness = rgbBrightness - 5;
-      FastLED.setBrightness(rgbBrightness);
+      setLEDBrightness();
     }
 
-    EncRes = EncDialCheck(1, rgbColour, 10, 1);
+    EncRes = EncDialCheck(1, rgbColour, 8, 0);
     if (EncRes == 2) {
       rgbColour = rgbColour + 1;
     } 
@@ -68,7 +67,7 @@ void RGBPage() {
       rgbColour = rgbColour - 1;
     }
 
-    EncRes = EncDialCheck(2, rgbEffect, 10, 1);
+    EncRes = EncDialCheck(2, rgbEffect, 4, 0);
     if (EncRes == 2) {
       rgbEffect = rgbEffect + 1;
     } 

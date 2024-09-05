@@ -17,4 +17,24 @@ void initialiseRGB();
 void checkRGBinterval();
 void updateLEDs();
 void RGBoff();
+
+void setLEDBrightness();
+
+void setLEDs();
+
+void lightMode1();
+void lightMode2();
+void lightMode3();
+void lightMode4();
+void lightMode5();
+
+void lightCol1(int i);
+void lightCol2(int i);
+void lightCol3(int i);
+void lightCol4(int i);
+void lightCol5(int i);
+void lightCol6(int i);
+void lightCol7(int i);
+void lightCol8(int i);
+void lightCol9(int i);
 #endif

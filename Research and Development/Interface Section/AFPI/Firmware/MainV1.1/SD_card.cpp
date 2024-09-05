@@ -58,6 +58,7 @@ Variable variables[] = {
     {"rgbBrightness", &rgbBrightness, updateInt},
     {"rgbColour", &rgbColour, updateInt},
     {"rgbEffect", &rgbEffect, updateInt},
+    {"lowPwrMode", &lowPwrMode, updateBool},
     {"oledContrast", &oledContrast, updateInt}
     
 };

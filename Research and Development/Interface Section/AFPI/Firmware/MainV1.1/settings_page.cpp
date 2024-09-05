@@ -3,6 +3,7 @@
 #include "config.h"
 #include "display.h"
 #include "RGB_processing.h"
+#include "low_pwr_mode.h"
 void settingsPage() {
   while (!ss.digitalRead(SS_ENC3_SWITCH)) {
     delay(50);
@@ -17,12 +18,17 @@ void settingsPage() {
     display.setCursor(10, 35);
     display.println(oledContrast);
     display.setCursor(55, 20);
-    display.print("val:");
+    display.print("loPwrmde:");
     display.setCursor(60, 35);
-    display.println("val");
+    if (lowPwrMode == true) {
+      display.println("ON");
+    } else {
+      display.println("OFF");
+    }
+    
     display.display();
 
-
+    checkRGBinterval();
     
 
     checkScreenTime();
@@ -41,16 +47,20 @@ void settingsPage() {
       oledContrast = oledContrast - 5;
       setOLEDContrast(oledContrast);
     }
-    // //Master Gain out Control Encoder Check
-    // param = backingMix;
-    // EncRes = EncDialCheck(1, param, 3.0, 0.0);
-    // if (EncRes == 2) {
-    //   backingMix = backingMix + 0.05;
-    //   master_mix.gain(0, backingMix);
-    // } 
-    // if (EncRes == 1) {
-    //   backingMix = backingMix - 0.05;
-    //   master_mix.gain(0, backingMix);
-    // }
+
+    if (!ss.digitalRead(SS_ENC1_SWITCH)) {
+      if (lowPwrMode == false){
+          lowPwrMode = true;
+          lowPwrModeHandle();
+      }
+      else {
+          lowPwrMode = false;
+          lowPwrModeHandle();
+      }
+      while (!ss.digitalRead(SS_ENC1_SWITCH)) {
+      delay(50);
+      }
+    }
+
   }
 }

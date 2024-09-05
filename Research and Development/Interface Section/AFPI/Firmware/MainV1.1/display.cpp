@@ -4,6 +4,10 @@
 #include "rotary_encoder_ctrl.h"
 #include "home_button.h"
 #include "RGB_processing.h"
+
+unsigned long screenSaverInterval;
+
+
 // Initialize the display object
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, OLED_RESET);
 
@@ -62,13 +66,25 @@ void initializeDisplay() {
 
     display.display();
     setOLEDContrast(oledContrast);
+    setSaverInterval();
     testLoadingScreen();
 }
 
 
 void setOLEDContrast(uint8_t contrast) {
   display.ssd1306_command(SSD1306_SETCONTRAST);
-  display.ssd1306_command(contrast);
+
+  if (lowPwrMode == true) {
+    if (contrast > 50) {
+      display.ssd1306_command(50);
+    } else {
+      display.ssd1306_command(contrast);
+    }
+  
+  } else {
+    display.ssd1306_command(contrast);
+  }
+  
 }
 
 
@@ -116,12 +132,18 @@ void setFXTemplatePage(char title[], bool& FXActive, bool fxCheck) {
     }
   }
 }
-
+void setSaverInterval() {
+  if (lowPwrMode == true) {
+    screenSaverInterval = 5000;
+  } else {
+    screenSaverInterval = 10000;
+  }
+}
 void checkScreenTime() {
     unsigned long currentMillis = millis(); // Get the current time
 
     // Check if 10 seconds have passed since the last reset and button has not been pressed
-    if (currentMillis - previousMillis >= interval) {
+    if (currentMillis - previousMillis >= screenSaverInterval) {
       previousMillis = currentMillis; // Reset the timer
       screenSaverActive();
     }
