@@ -1,0 +1,15 @@
+(kicad_sch (version 20230121) (generator eeschema)
+
+  (uuid 40075e6f-97e9-40eb-bea7-1832cfb2e0f9)
+
+  (paper "A3")
+
+  (lib_symbols
+  )
+
+
+  (text "Wireless MCU" (at 16.51 26.67 0)
+    (effects (font (size 7 7) (thickness 1.4) bold) (justify left bottom))
+    (uuid dfbb5b5b-a713-4baf-bad8-a5676c68eb63)
+  )
+)

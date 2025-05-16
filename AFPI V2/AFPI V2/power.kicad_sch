@@ -1,0 +1,15 @@
+(kicad_sch (version 20230121) (generator eeschema)
+
+  (uuid b3fc0d86-e57a-4d3d-8580-c73e3e96c8ab)
+
+  (paper "A3")
+
+  (lib_symbols
+  )
+
+
+  (text "Power" (at 13.97 24.13 0)
+    (effects (font (size 7 7) (thickness 1.4) bold) (justify left bottom))
+    (uuid dcf16f35-c48b-4f6c-acf9-a34d412d4c72)
+  )
+)
