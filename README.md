@@ -1,5 +1,12 @@
 # The Electronic Guitar MK1
 
+<img src="https://github.com/user-attachments/assets/6f7fdf49-825d-451c-a7b9-8be3157fd3e8" data-canonical-src="https://github.com/user-attachments/assets/6f7fdf49-825d-451c-a7b9-8be3157fd3e8" width="275" height="400"/>
+
+<img src="https://github.com/user-attachments/assets/fa07d7f7-db8a-4da3-886a-537a519272df" data-canonical-src="https://github.com/user-attachments/assets/fa07d7f7-db8a-4da3-886a-537a519272df" width="275" height="400"/>
+
+<img src="https://github.com/user-attachments/assets/d93b2070-a9af-42f3-9944-c3cdc3873ebc" data-canonical-src="https://github.com/user-attachments/assets/d93b2070-a9af-42f3-9944-c3cdc3873ebc" width="275" height="400"/>
+
+
 ## Table of Contents
 
 - [Introduction](#introduction)
@@ -16,18 +23,18 @@
 
 
 ## Introduction
-During the second half of 2023, I began experimenting with a concept of an 'all in one portable electric guitar'. The device would contain built in electronics for digital audio effects and signal modulation with an optional audio output between a 1 watt amplifier and speaker, headphone amp with 3.5mm jack, or a 1/4" jack for aux out for further modulation and amplification, all of which powered by either a removable rechargable battery or 2.5mm DC jack. My first attempt at this concept to put it simply was a failure, but a neccesary one. read [here](#electric-guitar-mk0-first-attempt) for the full breakdown of my first attempt.
+During the second half of 2023, I began experimenting with a concept of an 'all in one portable electric guitar'. The device would contain built in electronics for digital audio effects and signal modulation with an optional audio output between a 1 watt amplifier and speaker, headphone amp with 3.5mm jack, or a 1/4" jack for aux out for further modulation and amplification, all of which powered by either a removable rechargable battery or 2.5mm DC jack. My first attempt at this concept to put it simply was a failure, but a neccesary one. Read [here](#electric-guitar-mk0-first-attempt) for the full breakdown of my first attempt. After my failed attempt I spent 6 months learning electrical concepts through both personal research and Uni as at this point I switched degrees to Electrical Engineering as I found the hardware aspect of electronics fascinating, mostly because of this project. 
 
 ## My Prior Background
-I had started my Computer Science degree at the start of 2023 and before that had fiddled around with arduino and ESP32 Microcontroller projects, creating basic circuits and novice C programming with some very basic electrical theory, however this project was nothing like I had ever attempted. I also had some experience with woodworking through high school and personal jobs in the shed at home, but the craftmanship I needed for this task was also not ready. While my background was rather unimpressive, I was determined to complete this project myself by any means. This of course meant a great deal of learning and problem solving, and over the next 1.5 years (august 2023 - december 2024) I did sought out to do just that. 
+I had started my Computer Science degree at the start of 2023 and before that had fiddled around with arduino and ESP32 Microcontroller projects, creating basic circuits and novice C programming with some very basic electrical theory, however this project was nothing like I had ever attempted. I also had some experience with woodworking through high school and personal jobs in the shed at home, but the craftmanship I needed for this task was also not ready. While my background was rather unimpressive, I was determined to complete this project myself by any means. This of course meant a great deal of learning and problem solving, and over the next 1.5 years (august 2023 - december 2024) I did sought out to do just that. Read
 
 
 
-<img src="https://github.com/user-attachments/assets/6f7fdf49-825d-451c-a7b9-8be3157fd3e8" data-canonical-src="https://github.com/user-attachments/assets/6f7fdf49-825d-451c-a7b9-8be3157fd3e8" width="275" height="400"/>
 
-<img src="https://github.com/user-attachments/assets/d93b2070-a9af-42f3-9944-c3cdc3873ebc" data-canonical-src="https://github.com/user-attachments/assets/d93b2070-a9af-42f3-9944-c3cdc3873ebc" width="275" height="400"/>
 
-<img src="https://github.com/user-attachments/assets/fa07d7f7-db8a-4da3-886a-537a519272df" data-canonical-src="https://github.com/user-attachments/assets/fa07d7f7-db8a-4da3-886a-537a519272df" width="275" height="400"/>
+
+
+
 
 
 
@@ -80,11 +87,10 @@ The features of this Guitar are seperated into the following sections:
 <img src="https://github.com/user-attachments/assets/2b61481e-fd04-4a99-8314-2ab62f885f4d" data-canonical-src="https://github.com/user-attachments/assets/2b61481e-fd04-4a99-8314-2ab62f885f4d" width="275" height="400"/>
 <img src="https://github.com/user-attachments/assets/2b68e03b-8055-459c-a632-ab9024afa71e" data-canonical-src="https://github.com/user-attachments/assets/2b68e03b-8055-459c-a632-ab9024afa71e" width="275" height="400"/>
 <img src="https://github.com/user-attachments/assets/63045354-3f7c-42b4-bcbc-4b9c1ad852f8" data-canonical-src="https://github.com/user-attachments/assets/63045354-3f7c-42b4-bcbc-4b9c1ad852f8" width="400" height="275"/>
-<img src="https://github.com/user-attachments/assets/9b4ad88e-3aeb-4436-89f3-a7abf6b0a5f4" data-canonical-src="https://github.com/user-attachments/assets/9b4ad88e-3aeb-4436-89f3-a7abf6b0a5f4" width="400" height="275"/>
-<img src="https://github.com/user-attachments/assets/b2ceb06b-6ee6-4933-b40f-708f32b882f9" data-canonical-src="https://github.com/user-attachments/assets/b2ceb06b-6ee6-4933-b40f-708f32b882f9" width="400" height="275"/>
+
 <img src="https://github.com/user-attachments/assets/148f8853-0d81-427b-8be9-8154661c2e9d" data-canonical-src="https://github.com/user-attachments/assets/148f8853-0d81-427b-8be9-8154661c2e9d" width="400" height="275"/>
-<img src="https://github.com/user-attachments/assets/07cd014e-b3e3-4404-ae46-7ecd842fdd10" data-canonical-src="https://github.com/user-attachments/assets/07cd014e-b3e3-4404-ae46-7ecd842fdd10" width="400" height="275"/>
-<img src="https://github.com/user-attachments/assets/7e0dccc6-ba05-4742-a6f2-0f62fcaea02e" data-canonical-src="https://github.com/user-attachments/assets/7e0dccc6-ba05-4742-a6f2-0f62fcaea02e" width="400" height="275"/>
+
+
 
 
 ### Power Supply Features:
@@ -119,6 +125,7 @@ The features of this Guitar are seperated into the following sections:
 
 https://github.com/Wierdwizard2587/ElectricGuitarMK1/raw/refs/heads/main/Progress%20Photos/Woodworking/IMG_9428.MOV
 
+
 ### Physical Design Features:
   - Custom designed Body shape
   - Red Ceder wood for body
@@ -143,11 +150,11 @@ https://github.com/Wierdwizard2587/ElectricGuitarMK1/raw/refs/heads/main/Progres
 
 
 ## Electric Guitar MK0 First attempt
-I first came up with this concept around July 2023, where a regeular guitar could be retro fitted with electronics to create a cheap, simple portable electric guitar. Oh how wrong i was. With some moderate experience in playing with arduino's and Raspberry Pi's, a good bit of wood working experience with dad, and no electrical engineering experience, I set out on accomplishing my goal.
+The goal of this attempt was to retro fit a cheap electric guitar with electronics to create a cheap, simple portable electric guitar. Oh how wrong i was. With some moderate experience in playing with arduino's and Raspberry Pi's, a good bit of wood working experience, and no electrical engineering experience, I set out on accomplishing my goal.
 
 <img src="https://github.com/user-attachments/assets/6be55a72-e7aa-4a15-b726-ad1f1358878a" data-canonical-src="https://github.com/user-attachments/assets/6be55a72-e7aa-4a15-b726-ad1f1358878a" width="275" height="400"/>
 
-For the Guitar itself i had a chinese strat laying around that i found second hand at an Op shop for 20$ that i never used, because obviously it sounded terrible. The electronics were barely working, it was missing a tuning peg and just sounded terrible! but after cleaning it up, re wiring it with new cheap pickups and new tuning pegs, it was somewhat playable. i then totally destroyed the guitar by then routing out long wire tracks and spots for components among other things. I reckon it was less then half the weight of its former self when i was done with it. I repainted The boddy and neck Black and moved on to the electronics.
+For the Guitar itself i had a chinese strat laying around that i found second hand at an Op shop for 20$ AUD that i never used, because obviously it sounded terrible. The electronics were barely working, it was missing a tuning peg and just wasn't in good condition! but after cleaning it up, re wiring it with new cheap pickups and new tuning pegs, it was somewhat playable. I then mangled the guitar by routing out long wire tracks and spots for components among other things. I reckon it was less then half the weight of its former self when i was done with it. I repainted The boddy and neck Black and moved on to the electronics.
 
 <img src="https://github.com/user-attachments/assets/ff773c03-f57a-496b-be22-04634716b997" data-canonical-src="https://github.com/user-attachments/assets/ff773c03-f57a-496b-be22-04634716b997" width="275" height="400"/>
 <img src="https://github.com/user-attachments/assets/0ef9ab9a-f143-429b-a4f2-014b8baf1da7" data-canonical-src="https://github.com/user-attachments/assets/0ef9ab9a-f143-429b-a4f2-014b8baf1da7" width="275" height="400"/>
@@ -175,6 +182,7 @@ This all took place between July 2023 to October 2023 and after repeated failure
 
 ## Skills learnt
 
+<img src="https://github.com/user-attachments/assets/7e0dccc6-ba05-4742-a6f2-0f62fcaea02e" data-canonical-src="https://github.com/user-attachments/assets/7e0dccc6-ba05-4742-a6f2-0f62fcaea02e" width="400" height="275"/>
 
 ## Technical In Depth
 
