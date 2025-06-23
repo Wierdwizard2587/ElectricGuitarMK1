@@ -1,7 +1,11 @@
 # The Electronic Guitar MK1
 
 ## Introduction
-This is the repository for the Research and Development, Production, and assembly of the Electric Guitar MK1. 
+During the second half of 2023, I began experimenting with a concept of an 'all in one portable electric guitar'. The device would contain built in electronics for digital audio effects and signal modulation with an optional audio output between a 1 watt amplifier and speaker, headphone amp with 3.5mm jack, or a 1/4" jack for aux out for further modulation and amplification, all of which powered by either a removable rechargable battery or 2.5mm DC jack. My first attempt at this concept to put it simply was a failure, but a neccesary one. read [here]((#electric-guitar-mk0-first-attempt)) for the full
+
+## My Prior Background
+I had started my Computer Science degree at the start of 2023 and before that had fiddled around with arduino and ESP32 Microcontroller projects, creating basic circuits and novice C programming with some very basic electrical theory, however this project was nothing like I had ever attempted. I also had some experience with woodworking through high school and personal jobs in the shed at home, but the craftmanship I needed for this task was also not ready. While my background was rather unimpressive, I was determined to complete this project myself by any means. This of course meant a great deal of learning and problem solving, and over the next 1.5 years (august 2023 - december 2024) I did sought out to do just that. 
+
 
 
 <img src="https://github.com/user-attachments/assets/6f7fdf49-825d-451c-a7b9-8be3157fd3e8" data-canonical-src="https://github.com/user-attachments/assets/6f7fdf49-825d-451c-a7b9-8be3157fd3e8" width="275" height="400"/>
@@ -123,7 +127,7 @@ https://github.com/Wierdwizard2587/ElectricGuitarMK1/raw/refs/heads/main/Progres
 
 
 
-## First Attempt 
+## Electric Guitar MK0 (first attempt) 
 I first came up with this concept around July 2023, where a regeular guitar could be retro fitted with electronics to create a cheap, simple portable electric guitar. Oh how wrong i was. With some moderate experience in playing with arduino's and Raspberry Pi's, a good bit of wood working experience with dad, and no electrical engineering experience, I set out on accomplishing my goal.
 
 <img src="https://github.com/user-attachments/assets/6be55a72-e7aa-4a15-b726-ad1f1358878a" data-canonical-src="https://github.com/user-attachments/assets/6be55a72-e7aa-4a15-b726-ad1f1358878a" width="275" height="400"/>
