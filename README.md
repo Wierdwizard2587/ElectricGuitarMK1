@@ -1,7 +1,22 @@
 # The Electronic Guitar MK1
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [My Prior Background](#my-prior-background)
+- [Features](#features)
+  - [AFPI Features](#afpi-features)
+  - [Power Supply Features](#power-supply-features)
+  - [RGB Lighting Features](#rgb-lighting-features)
+  - [Physical Design Features](#physical-design-features)
+  - [Guitar Specific Features](#guitar-specific-features)
+- [Electric Guitar MK0 First attempt](#electric-guitar-mk0-first-attempt)
+- [Skills learnt](#skills-learnt)
+- [Technical In Depth](#technical-in-depth)
+
+
 ## Introduction
-During the second half of 2023, I began experimenting with a concept of an 'all in one portable electric guitar'. The device would contain built in electronics for digital audio effects and signal modulation with an optional audio output between a 1 watt amplifier and speaker, headphone amp with 3.5mm jack, or a 1/4" jack for aux out for further modulation and amplification, all of which powered by either a removable rechargable battery or 2.5mm DC jack. My first attempt at this concept to put it simply was a failure, but a neccesary one. read [here](#electric-guitar-mk0-first-attempt) for the full
+During the second half of 2023, I began experimenting with a concept of an 'all in one portable electric guitar'. The device would contain built in electronics for digital audio effects and signal modulation with an optional audio output between a 1 watt amplifier and speaker, headphone amp with 3.5mm jack, or a 1/4" jack for aux out for further modulation and amplification, all of which powered by either a removable rechargable battery or 2.5mm DC jack. My first attempt at this concept to put it simply was a failure, but a neccesary one. read [here](#electric-guitar-mk0-first-attempt) for the full breakdown of my first attempt.
 
 ## My Prior Background
 I had started my Computer Science degree at the start of 2023 and before that had fiddled around with arduino and ESP32 Microcontroller projects, creating basic circuits and novice C programming with some very basic electrical theory, however this project was nothing like I had ever attempted. I also had some experience with woodworking through high school and personal jobs in the shed at home, but the craftmanship I needed for this task was also not ready. While my background was rather unimpressive, I was determined to complete this project myself by any means. This of course meant a great deal of learning and problem solving, and over the next 1.5 years (august 2023 - december 2024) I did sought out to do just that. 
