@@ -194,6 +194,42 @@ This all took place between July 2023 to October 2023 and after repeated failure
 
 <img src="https://github.com/user-attachments/assets/7e0dccc6-ba05-4742-a6f2-0f62fcaea02e" data-canonical-src="https://github.com/user-attachments/assets/7e0dccc6-ba05-4742-a6f2-0f62fcaea02e" width="400" height="275"/>
 
+
+
+### Electrical theory
+- Assembled many breadboard circuits of various guitar pedal effects, learning how each component influences the circuit as I went
+- Began using basic concepts of voltage, current, resistance and power to make simple custom circuits with 555 timers
+- Began experimenting with perf boards for more permanent guitar pedals but had trouble at first with bugs due to soldering skills. After practicing however and correcting my mistakes my failure rate dropped. 
+- At this point perf boards were becoming tedious to repeatedly make circuits, compared to breadboards, so I  heavily experimented with pcbs, however instead of ordering them I would DIY them. 
+
+
+
+
+### Custom pcb manufacturing
+
+- PCB manufacturing at a basic level consists of etching traces on a copper topped fibreglass board and drilling any through holes required. 
+- I would experiment with two different forms of etching, Chemical etching and CNC etching. 
+
+
+#### chemical etching 
+
+Chemical etching involved imprinting an image of the circuit traces onto the copper of the board then chemically removing the copper not covered with the circuit image, leaving being only traces.
+
+
+
+This was done by first:
+
+using photoresist coated pcb blanks and getting a printed copy of the pcb traces in black and white, soaking the paper in mineral oil and placing it over the photoresist. 
+The board was then placed in a custom uv light chamber which itself used a pcb I custom made to control the uv intensity and timer. This was then used to cure the photo resist. 
+After the curing stage was over I would place the board in a positive resist solution to remove the excess ink from the board to leave behind only the circuit trace on the board covered by the photo resist
+The board was then put into a tub of ferric chloride to then dissolve the copper not covered by the photo resist
+The board is then taken out of the ferric chloride and placed in water to stop the dissolving process. Acetone was then applied on top to remove the photoresist over the traces to leave behind an etched PCB
+All that’s left is to drill through holes with a dremel for components and solder them on. 
+
+
+This worked for a while, but overall it was a process that was time consuming and was difficult to achieve 2 layered boards accurately as lining them up on both sides proved troublesome. I was always going to utilise a CNC mill for making components for the guitar but I found it could be used for milling PCB traces so I began experimenting. 
+
+
 ## Technical In Depth
 
 
