@@ -9,7 +9,7 @@
 - DIY portable electric guitar with integrated digital effects and modular power/audio system  
 - Final version features Teensy 4.0, onboard FX, rotary encoder UI, OLED display, amp/speaker output, battery or DC power, and RGB lighting  
 - Entire build: woodwork, PCBs, 3D prints, firmware, and more  
-- Early prototype (Mk0) failed due to poor electrical design and overcomplex hardware — rebuilt from scratch over 12+ months with newly acquired engineering and fabrication skills  
+- Early prototype (Mk0) failed due to poor electrical design and overcomplex hardware, rebuilt from scratch over 12+ months with newly acquired engineering and fabrication skills  
 
 
 <img src="https://github.com/user-attachments/assets/6f7fdf49-825d-451c-a7b9-8be3157fd3e8" data-canonical-src="https://github.com/user-attachments/assets/6f7fdf49-825d-451c-a7b9-8be3157fd3e8" width="275" height="400"/><img src="https://github.com/user-attachments/assets/fa07d7f7-db8a-4da3-886a-537a519272df" data-canonical-src="https://github.com/user-attachments/assets/fa07d7f7-db8a-4da3-886a-537a519272df" width="275" height="400"/><img src="https://github.com/user-attachments/assets/d93b2070-a9af-42f3-9944-c3cdc3873ebc" data-canonical-src="https://github.com/user-attachments/assets/d93b2070-a9af-42f3-9944-c3cdc3873ebc" width="275" height="400"/>
@@ -58,8 +58,9 @@
 - Controlled via UI with adjustable patterns and brightness  
 - 5V from Teensy board, expandable via breakout  
 - Mounted in a custom 3D enclosure with acrylic cover  
+- See [Demo](https://github.com/Wierdwizard2587/ElectricGuitarMK1/raw/main/Progress%20Photos/Woodworking/IMG_9428.MOV)
 
-<!-- Insert lighting demo photo or video -->
+
 
 ### Design Decisions
 
@@ -100,7 +101,7 @@ The Mk0 was an ambitious retrofit of a cheap Stratocaster copy, originally sourc
 ### Body and Structural Work
 - The original guitar was re-routed to fit electronics, resulting in reduced structural integrity and balance
 - Body was repainted and cleaned up with minor woodworking skills from high school
-- Attempted to house a Raspberry Pi, amplifier board, fans, wiring and more — all glued to plywood mounts inside the guitar
+- Attempted to house a Raspberry Pi, amplifier board, fans, wiring and more. all glued to plywood mounts inside the guitar
 
 <img src="https://github.com/user-attachments/assets/ff773c03-f57a-496b-be22-04634716b997" data-canonical-src="https://github.com/user-attachments/assets/ff773c03-f57a-496b-be22-04634716b997" width="275" height="400"/><img src="https://github.com/user-attachments/assets/0ef9ab9a-f143-429b-a4f2-014b8baf1da7" data-canonical-src="https://github.com/user-attachments/assets/0ef9ab9a-f143-429b-a4f2-014b8baf1da7" width="275" height="400"/>
 
@@ -165,10 +166,11 @@ https://github.com/user-attachments/assets/3b78b966-fe12-4d0b-8b32-34254987f5ec
 
 - **CNC woodworking and mechanical precision**
   - Created tight-fitting neck pockets and pickup cutouts with minimal play, ensuring mechanical stability and alignment.
+ 
+<img src="https://github.com/Wierdwizard2587/ElectricGuitarMK1/blob/main/Progress%20Photos/Woodworking/IMG_9408.JPEG" data-canonical-src="https://github.com/Wierdwizard2587/ElectricGuitarMK1/blob/main/Progress%20Photos/Woodworking/IMG_9408.JPEG" width="300" height="400"/><img src="https://github.com/Wierdwizard2587/ElectricGuitarMK1/blob/main/Progress%20Photos/Woodworking/IMG_9404.JPEG" data-canonical-src="https://github.com/Wierdwizard2587/ElectricGuitarMK1/blob/main/Progress%20Photos/Woodworking/IMG_9404.JPEG" width="300" height="400"/><img src="https://github.com/Wierdwizard2587/ElectricGuitarMK1/blob/main/Progress%20Photos/Woodworking/IMG_9453.JPEG" data-canonical-src="https://github.com/Wierdwizard2587/ElectricGuitarMK1/blob/main/Progress%20Photos/Woodworking/IMG_9453.JPEG" width="300" height="400"/>
+
 
 Each step of the learning process fed directly into the reliability and performance of the final Mk1 design.
-
-
 
 ---
 
