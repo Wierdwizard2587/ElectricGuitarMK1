@@ -12,11 +12,7 @@
 - Early prototype (Mk0) failed due to poor electrical design and overcomplex hardware — rebuilt from scratch over 12+ months with newly acquired engineering and fabrication skills  
 
 
-<img src="https://github.com/user-attachments/assets/6f7fdf49-825d-451c-a7b9-8be3157fd3e8" data-canonical-src="https://github.com/user-attachments/assets/6f7fdf49-825d-451c-a7b9-8be3157fd3e8" width="275" height="400"/>
-
-<img src="https://github.com/user-attachments/assets/fa07d7f7-db8a-4da3-886a-537a519272df" data-canonical-src="https://github.com/user-attachments/assets/fa07d7f7-db8a-4da3-886a-537a519272df" width="275" height="400"/>
-
-<img src="https://github.com/user-attachments/assets/d93b2070-a9af-42f3-9944-c3cdc3873ebc" data-canonical-src="https://github.com/user-attachments/assets/d93b2070-a9af-42f3-9944-c3cdc3873ebc" width="275" height="400"/>
+<img src="https://github.com/user-attachments/assets/6f7fdf49-825d-451c-a7b9-8be3157fd3e8" data-canonical-src="https://github.com/user-attachments/assets/6f7fdf49-825d-451c-a7b9-8be3157fd3e8" width="275" height="400"/><img src="https://github.com/user-attachments/assets/fa07d7f7-db8a-4da3-886a-537a519272df" data-canonical-src="https://github.com/user-attachments/assets/fa07d7f7-db8a-4da3-886a-537a519272df" width="275" height="400"/><img src="https://github.com/user-attachments/assets/d93b2070-a9af-42f3-9944-c3cdc3873ebc" data-canonical-src="https://github.com/user-attachments/assets/d93b2070-a9af-42f3-9944-c3cdc3873ebc" width="275" height="400"/>
 
 ---
 
@@ -34,9 +30,7 @@
   - 1/4" AUX output  
 - **SD Card:** for saving and loading effect presets  
 
-<img src="https://github.com/user-attachments/assets/5239486c-7751-4ee9-8c51-16a76888f950" data-canonical-src="https://github.com/user-attachments/assets/5239486c-7751-4ee9-8c51-16a76888f950" width="275" height="400" />
-
-<img src="https://github.com/user-attachments/assets/2b61481e-fd04-4a99-8314-2ab62f885f4d" data-canonical-src="https://github.com/user-attachments/assets/2b61481e-fd04-4a99-8314-2ab62f885f4d" width="275" height="400"/>
+<img src="https://github.com/user-attachments/assets/5239486c-7751-4ee9-8c51-16a76888f950" data-canonical-src="https://github.com/user-attachments/assets/5239486c-7751-4ee9-8c51-16a76888f950" width="275" height="400" /><img src="https://github.com/user-attachments/assets/2b61481e-fd04-4a99-8314-2ab62f885f4d" data-canonical-src="https://github.com/user-attachments/assets/2b61481e-fd04-4a99-8314-2ab62f885f4d" width="275" height="400"/>
 
 ### Physical Design
 
@@ -108,9 +102,7 @@ The Mk0 was an ambitious retrofit of a cheap Stratocaster copy, originally sourc
 - Body was repainted and cleaned up with minor woodworking skills from high school
 - Attempted to house a Raspberry Pi, amplifier board, fans, wiring and more — all glued to plywood mounts inside the guitar
 
-<img src="https://github.com/user-attachments/assets/ff773c03-f57a-496b-be22-04634716b997" data-canonical-src="https://github.com/user-attachments/assets/ff773c03-f57a-496b-be22-04634716b997" width="275" height="400"/>
-
-<img src="https://github.com/user-attachments/assets/0ef9ab9a-f143-429b-a4f2-014b8baf1da7" data-canonical-src="https://github.com/user-attachments/assets/0ef9ab9a-f143-429b-a4f2-014b8baf1da7" width="275" height="400"/>
+<img src="https://github.com/user-attachments/assets/ff773c03-f57a-496b-be22-04634716b997" data-canonical-src="https://github.com/user-attachments/assets/ff773c03-f57a-496b-be22-04634716b997" width="275" height="400"/><img src="https://github.com/user-attachments/assets/0ef9ab9a-f143-429b-a4f2-014b8baf1da7" data-canonical-src="https://github.com/user-attachments/assets/0ef9ab9a-f143-429b-a4f2-014b8baf1da7" width="275" height="400"/>
 
 ### Electronics and Power Mistakes
 - Raspberry Pi 3B+ used for DSP software and effects switching via Linux keybinds
@@ -119,11 +111,7 @@ The Mk0 was an ambitious retrofit of a cheap Stratocaster copy, originally sourc
 - Power: attempted to use a Makita 18V battery regulated by a voltage divider made from two 10W resistors (which exploded)
 - Eventually switched to an XL6009 buck converter, mounted haphazardly on wood
 
-<img src="https://github.com/user-attachments/assets/6be55a72-e7aa-4a15-b726-ad1f1358878a" data-canonical-src="https://github.com/user-attachments/assets/6be55a72-e7aa-4a15-b726-ad1f1358878a" width="275" height="400"/>
-
-<img src="https://github.com/user-attachments/assets/2291a653-926c-473b-aa5e-9037798f8677" data-canonical-src="https://github.com/user-attachments/assets/2291a653-926c-473b-aa5e-9037798f8677" width="275" height="400"/>
-
-<img src="https://github.com/user-attachments/assets/fd7dbe5e-e7b7-4618-843a-95f4d449869e" data-canonical-src="https://github.com/user-attachments/assets/fd7dbe5e-e7b7-4618-843a-95f4d449869e" width="300" height="400"/>
+<img src="https://github.com/user-attachments/assets/6be55a72-e7aa-4a15-b726-ad1f1358878a" data-canonical-src="https://github.com/user-attachments/assets/6be55a72-e7aa-4a15-b726-ad1f1358878a" width="275" height="400"/><img src="https://github.com/user-attachments/assets/2291a653-926c-473b-aa5e-9037798f8677" data-canonical-src="https://github.com/user-attachments/assets/2291a653-926c-473b-aa5e-9037798f8677" width="275" height="400"/><img src="https://github.com/user-attachments/assets/fd7dbe5e-e7b7-4618-843a-95f4d449869e" data-canonical-src="https://github.com/user-attachments/assets/fd7dbe5e-e7b7-4618-843a-95f4d449869e" width="300" height="400"/>
 
 ### Audio and Shielding Failures
 - Output sound had constant noise and interference, making the guitar unplayable
